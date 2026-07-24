@@ -19,5 +19,5 @@ import com.example.demo.model.Transaction;
 @RepositoryRestResource
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-	List<Transaction> findBystatus(String status); 
+	List<Transaction> findByStatus(String status);
 }

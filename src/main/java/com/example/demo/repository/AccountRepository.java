@@ -24,7 +24,7 @@ import com.example.demo.model.Customer;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-	List<Account> findBystatus(String status); 
+	List<Account> findByStatus(String status);
 	
 	
   //  @Query("FROM Account a WHERE a.customer.id = :id")

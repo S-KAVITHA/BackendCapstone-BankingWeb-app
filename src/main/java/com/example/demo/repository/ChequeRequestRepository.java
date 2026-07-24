@@ -14,6 +14,6 @@ import com.example.demo.model.FundsTransfer;
 
 @Repository
 public interface ChequeRequestRepository extends CrudRepository<ChequeRequest, Long> {
-	List<ChequeRequest> findBystatus(String status);
+	List<ChequeRequest> findByStatus(String status);
 
 }

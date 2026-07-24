@@ -16,5 +16,5 @@ import com.example.demo.model.BankAdmin;
 @Repository
 public interface BankAdminRepository extends CrudRepository<BankAdmin, Long> {
 
-	List<BankAdmin> findByemailId(String emailId);
+	List<BankAdmin> findByEmailId(String emailId);
 }

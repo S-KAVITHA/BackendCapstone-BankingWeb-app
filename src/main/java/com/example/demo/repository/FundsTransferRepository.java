@@ -17,5 +17,5 @@ import com.example.demo.model.Transaction;
 @Repository
 public interface FundsTransferRepository extends CrudRepository<FundsTransfer, Long> {
 	 
-	List<FundsTransfer> findBystatus(String status);
+	List<FundsTransfer> findByStatus(String status);
 }

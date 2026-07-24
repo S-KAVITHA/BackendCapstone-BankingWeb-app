@@ -21,13 +21,12 @@ import com.example.demo.model.Customer;
 	  
 	 // @EntityGraph(value = "customer.accounts", type = EntityGraphType.FETCH)
 	//  @Query("select r.customerId from Customer r inner join fetch r.accounts where r.customerId = :id")
+
+      @Query("SELECT a FROM Account a WHERE a.customerId.customerId = :id")
+      List<Account> findByCustomerId(@Param("id") Long id);
+
+	  List<Customer> findByEmailId(String emailId);
 	  
-		
-	 @Query("SELECT  a FROM Customer c, Account a WHERE c.customerId = :id")
-	  List<Account> findBycustomerId(@Param("id") Long id);;	
-	  
-	  List<Customer> findByemailId(String emailId);
-	  
-	  List<Customer> findBystatus(String status);
+	  List<Customer> findByStatus(String status);
   }
  
