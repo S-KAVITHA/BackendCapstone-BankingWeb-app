@@ -1,0 +1,19 @@
+Files in /workspace:
+- README.md, setup.md          - project docs
+- pom.xml, mvnw, mvnw.cmd       - Maven build files
+- Dockerfile, docker-entrypoint.sh - containerization
+- settings.json, statusline.sh  - misc config/tooling scripts
+- src/                          - Java source (main + test)
+- target/                       - Maven build output
+- .git, .idea, .mvn             - VCS/IDE/Maven config directories
+- test.txt                      - scratch file
+
+This repository is "Capstone Banking Web Application Backend" — a Java-based RESTful service built with Spring Boot 2.7.18, Spring Data JPA/Hibernate, and MySQL.
+
+Key features:
+- User & Role Management: administrative and customer credentials with role-based access control (ADMIN, BANK_ADMIN, USER).
+- Customer Profile Service: manages customer records, personal details, contact info, and account status (ACTIVE, INACTIVE, PENDING).
+- Account Management: APIs for bank account operations, including balance updates, currency formatting, branch assignments, and linking accounts to customer profiles via primary/foreign key relationships.
+- Database Integration: JPA annotations, sequence generators, and relational tables (customer, account, bank_admin) for data integrity and transactional consistency.
+
+Built with Maven, packaged as a standard Spring Boot application, and containerized via a Dockerfile.
