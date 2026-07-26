@@ -7,7 +7,7 @@ This document contains the commands required to build, run, and verify the appli
 ```bash
 docker build -t backend-banking-capstone-app .
 ```
-------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 
 ## 2. Run the Container
 
@@ -19,7 +19,7 @@ docker run -it --rm \
   -v "claude-auth:/claude-auth" \
   backend-banking-capstone-app
 ```
-------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 
 ## 3. Verify Network Egress
 
@@ -31,27 +31,9 @@ curl -I https://www.google.com
 
 Actual result:
 
-<img width="1881" height="619" alt="image" src="https://github.com/user-attachments/assets/e8cc824a-f5ed-4475-9727-b4ad6ce56d97" />
+<img width="943" height="375" alt="image" src="https://github.com/user-attachments/assets/27cb63ee-1fef-4ef0-a037-2e929a651662" />
 
-ai-course:/workspace# curl -I https://www.google.com
-**HTTP/2 200**
-content-type: text/html; charset=ISO-8859-1
-content-security-policy-report-only: object-src 'none';base-uri 'self';script-src 'nonce-4N3eo9Frm-bSWLOD89arrw' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-uri https://csp.withgoogle.com/csp/gws/other-hp
-accept-ch: Sec-CH-Prefers-Color-Scheme
-p3p: CP="This is not a P3P policy! See g.co/p3phelp for more info."
-date: Sun, 26 Jul 2026 18:32:38 GMT
-server: gws
-x-xss-protection: 0
-x-frame-options: SAMEORIGIN
-expires: Sun, 26 Jul 2026 18:32:38 GMT
-cache-control: private
-set-cookie: __Secure-STRP=ANmZwa35RMQq5Cq7ulVoij6kSHphQyvUHKM_-XBSTqWzrgwmT4ozjFTQMAnl3IqBA4bdNaz2doBkehBHecmiDD5n3D42YrMCQ19d; expires=Sun, 26-Jul-2026 18:37:38 GMT; path=/; domain=.google.com; Secure; SameSite=strict
-set-cookie: AEC=AdJVEavsVhlBDtifaLd8oaDayJjq-6Oj_DIjErKih_nGigz22TLnO_ogmRI; expires=Fri, 22-Jan-2027 18:32:38 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=lax
-set-cookie: NID=533=Js4L5VHHqkshjC5LnnVEjyWbV77qJoUtvy_eh_1UAeFsuolZp-LADN6GjcFlNqDQnPidxEqPv_LCCllGC-Gj9kU0ALupJWF6-6iTXcEWRCNIBBq-XB68WuUMKrjBHiiNSnf1pkDQYCW3sI1rX6IXdzW9uOAGFr9zep39KKJYoIXUPaXrfjP0MfTwgXP8_QBQDrq2yKgZjVssy6-xypxHWZpORw; expires=Mon, 25-Jan-2027 18:32:38 GMT; path=/; domain=.google.com; HttpOnly
-alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
-ai-course:/workspace#
-
-------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 
 ### Isolated Run (No Network Access)
 
@@ -68,44 +50,37 @@ Check whether the container can reach the network.
 
 Actual result:
 
-user@DESKTOP-A52GAEQ:/mnt/c/Users/user/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$ docker run -it --rm --network none -v "${PWD}:/workspace" backend-banking-capstone-app
-ai-course:/workspace# curl -I https://www.google.com
-curl: (6) Could not resolve host: www.google.com
-ai-course:/workspace#
+<img width="947" height="74" alt="image" src="https://github.com/user-attachments/assets/b2bd6870-d5f4-4fc2-b688-ea5751fee844" />
 
-------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------
 ## 4. Smoke Test
-
 
 After entering the container, I launched the Claude CLI by running:
   bash
   claude
-  
+
+  <img width="1876" height="940" alt="image" src="https://github.com/user-attachments/assets/967cb166-4d01-4755-8d28-f19ff270e7b0" />
+
 Prompt executed in the Claude CLI:
   
 “List the files in /workspace and write a short summary of what this repo does to a file called summary.txt.”
 
 Actual Result:
 
-ai-course:/workspace#
-ai-course:/workspace# ls
-Dockerfile  README.md  docker-entrypoint.sh  mvnw  mvnw.cmd  pom.xml  settings.json  setup.md  src  statusline.sh  summary.txt  target  test.txt
-ai-course:/workspace#
+<img width="1906" height="1003" alt="image" src="https://github.com/user-attachments/assets/96ac6a25-1820-4b26-84cd-8aff15940ff2" />
+
 
 “List the files in /Users/user and write a short summary of what this repo does to a file called summary.txt.”
 
 Actual Result:
 
-/Users/user doesn't exist on this system — this is a Linux environment, and that's a macOS-style path. There's no such directory here.
+<img width="947" height="374" alt="image" src="https://github.com/user-attachments/assets/341d8eda-e815-4404-8563-279ee924680c" />
 
 To verify that the container and repository were functioning correctly, I entered the "run smoke test" prompt in the Claude CLI.
 
 Actual Result:
 
- run smoke test
- Ran 1 shell command
- Smoke test passed again: BUILD SUCCESS, 16/16 tests passed, no failures or errors.
-
+<img width="1887" height="1002" alt="image" src="https://github.com/user-attachments/assets/3c502cf0-2411-4b41-9b0c-444c2edb4c47" />
 
 ------------------------------------------------------------------------------------------------------------------
 ## 5. Project-Specific Security Decisions
