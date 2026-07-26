@@ -31,6 +31,8 @@ curl -I https://www.google.com
 
 Actual result:
 
+<img width="1881" height="619" alt="image" src="https://github.com/user-attachments/assets/e8cc824a-f5ed-4475-9727-b4ad6ce56d97" />
+
 ai-course:/workspace# curl -I https://www.google.com
 **HTTP/2 200**
 content-type: text/html; charset=ISO-8859-1
