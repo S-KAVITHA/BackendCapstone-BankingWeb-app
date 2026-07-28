@@ -64,12 +64,20 @@ After entering the container, I launched the claude CLI by running:
   ![img_9.png](img_9.png)
   
 Prompt executed in the claude CLI:
-  
+
+The first prompt:
+
 “List the files in /workspace and write a short summary of what this repo does to a file called summary.txt.”
 
 Actual Result:
 
 ![img_11.png](img_11.png)
+
+completed successfully, confirming that Claude could access the mounted  /workspace directory and create summary.txt within the mounted project.
+
+After exiting the container, I verified that summary.txt existed in the project directory on the host (ls summary.txt), confirming that writes inside /workspace persisted through the bind mount.
+
+The second prompt:
 
 “List the files in /Users/user and write a short summary of what this repo does to a file called summary.txt.”
 
@@ -77,28 +85,23 @@ Actual Result:
 
 ![img_10.png](img_10.png)
 
-To verify that the container and repository were functioning correctly, I entered the "run smoke test" prompt in the claude CLI.
+This prompt failed because /Users/user was not mounted into the container. This confirmed that directories outside the mounted project were inaccessible.
 
+These checks verified that:
+
+only the mounted project directory was accessible
+file writes were limited to /workspace
+host directories outside the mount were inaccessible
+
+Smoke Test:
+
+After confirming the filesystem boundaries, I executed the "run smoke test" 
+prompt in the Claude CLI.
+
+The smoke test completed successfully, demonstrating that the containerized environment, mounted project, and Claude CLI were functioning correctly together and that the repository could be accessed and analyzed within the intended execution environment.
 Actual Result:
 
 ![img_12.png](img_12.png)
-
-## What the Smoke Test Verified
-
-The smoke test confirmed that claude could access only the mounted `/workspace`
-directory and successfully created `summary.txt` there.
-
-After exiting the container, I verified that `summary.txt` existed in the project directory on the host (`ls summary.txt`), 
-confirming that writes inside `/workspace` persisted through the bind mount.
-
-When asked to access `/Users/user`, claude could not access that location because
-it was not mounted into the container.
-
-This verified that:
-
-- file writes were limited to the mounted project directory
-- host files outside the mount were inaccessible
-- the container respected the intended filesystem boundary
 
 ------------------------------------------------------------------------------------------------------------------
 ## 5. Project-Specific Security Decisions
@@ -153,8 +156,7 @@ banking project.
 
 **Decision:** Only explicitly mounted directories are accessible inside the container.
 
-**Reason:** The smoke test confirmed that `/workspace` was accessible while `/Users/user` was unavailable, demonstrating the intended filesystem boundary.
-
+**Reason:** The filesystem verification prompt confirmed that /workspace was accessible while /Users/user was inaccessible because it was not mounted into the container.
 
 ### 7. Least Privilege
 
