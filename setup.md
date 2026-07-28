@@ -59,6 +59,7 @@ Actual result:
 After entering the container, I launched the claude CLI by running:
   ```bash
   claude
+```
 
   ![img_9.png](img_9.png)
   
@@ -118,7 +119,6 @@ banking project.
 
 **Risk Prevented:** Without this boundary, a misbehaving agent or attacker could access unrelated host files, read sensitive documents, or modify files outside the banking application.
 
----
 
 ### 2. Authentication Storage
 
@@ -126,7 +126,6 @@ banking project.
 
 **Reason:** Keeps authentication data separate from the project files and allows authentication to persist across container runs.
 
----
 
 ### 3. Network Access
 
@@ -136,7 +135,6 @@ banking project.
 
 **Risk Prevented:** Without controlled network access, a compromised agent could make unauthorized outbound requests, leak application data, or communicate with untrusted external services.
 
----
 
 ### 4. Network Isolation
 
@@ -144,7 +142,6 @@ banking project.
 
 **Reason:** Verifies that the application can operate in a fully isolated environment where external network access is disabled.
 
----
 
 ### 5. Container Lifecycle
 
@@ -152,15 +149,12 @@ banking project.
 
 **Reason:** Automatically removes the container after it exits, preventing unused containers from accumulating.
 
----
-
 ### 6. Filesystem Isolation
 
 **Decision:** Only explicitly mounted directories are accessible inside the container.
 
 **Reason:** The smoke test confirmed that `/workspace` was accessible while `/Users/user` was unavailable, demonstrating the intended filesystem boundary.
 
----
 
 ### 7. Least Privilege
 
@@ -179,7 +173,6 @@ banking project.
 
 **Mitigation:** Regularly scan Maven dependencies, review security advisories, and update vulnerable dependencies before deployment.
 
----
 
 ### Application Secret Exposure Risk
 
@@ -187,7 +180,6 @@ banking project.
 
 **Mitigation:** Store secrets using environment variables or a secure secret manager and review configuration files before deployment.
 
----
 
 ### Agent Modification Risk
 
