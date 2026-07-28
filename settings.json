@@ -1,7 +1,138 @@
-{
-  "statusLine": {
-    "type": "command",
-    "command": "bash /root/.claude/statusline.sh",
-    "padding": 0
-  }
-}
+# Product Requirements Document
+
+## Project
+Backend Banking Web Application
+
+## Objective
+Develop a secure Spring Boot banking application that allows administrators and customers to perform banking operations through REST APIs.
+
+## Features
+
+### Customer
+- Create account
+- View account details
+- Deposit money
+- Withdraw money
+- Transfer funds
+- View transaction history
+
+### Admin
+- Manage customer accounts
+- View all customers
+- Manage banking operations
+
+## Technical Requirements
+
+- Java 17
+- Spring Boot
+- Maven
+- REST APIs
+- JUnit 5
+- Mockito
+- Docker
+
+## Non-functional Requirements
+
+- Unit test coverage
+- Secure containerized environment
+- Maintainable code
+- RESTful API design
+
+## Success Criteria
+
+- All tests pass
+- Application starts successfully
+- Docker environment works
+- API endpoints function correctly
+
+
+
+
+
+=====================
+
+
+
+# Project Rubric
+
+## Functionality
+
+- REST APIs work correctly
+- Customer operations implemented
+- Admin operations implemented
+
+## Testing
+
+- Unit tests added
+- Controller tests use Mockito
+- All tests pass
+
+## Code Quality
+
+- Follows Java conventions
+- Clear naming
+- Proper package structure
+
+## Documentation
+
+- README updated
+- setup.md included
+- PRD complete
+
+## Docker
+
+- Image builds successfully
+- Container starts
+- Smoke test passes
+
+## Security
+
+- Workspace isolation
+- Network verification
+- Least privilege
+
+==============================
+
+
+
+# Iteration Log
+
+## Iteration 1
+
+Completed:
+- Docker setup
+- Claude CLI
+- Smoke test
+
+Issues:
+- Git authentication expired
+
+Resolution:
+- Re-authenticated Claude
+
+---
+
+## Iteration 2
+
+Completed:
+- Added controller tests
+- Updated README
+- Parallel agent workflow
+
+Issues:
+- Merge conflict
+
+Resolution:
+- Reviewed changes and merged manually
+
+---
+
+## Iteration 3
+
+Completed:
+- Security decisions
+- Final documentation
+- Worktree cleanup
+
+Status:
+Ready for submission
