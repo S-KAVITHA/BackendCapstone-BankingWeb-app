@@ -60,28 +60,27 @@ After entering the container, I launched the claude CLI by running:
   ```bash
   claude
 
-  <img width="1876" height="940" alt="image" src="https://github.com/user-attachments/assets/967cb166-4d01-4755-8d28-f19ff270e7b0" />
-
+  ![img_9.png](img_9.png)
+  
 Prompt executed in the claude CLI:
   
 “List the files in /workspace and write a short summary of what this repo does to a file called summary.txt.”
 
 Actual Result:
 
-<img width="1906" height="1003" alt="image" src="https://github.com/user-attachments/assets/96ac6a25-1820-4b26-84cd-8aff15940ff2" />
-
+![img_11.png](img_11.png)
 
 “List the files in /Users/user and write a short summary of what this repo does to a file called summary.txt.”
 
 Actual Result:
 
-<img width="947" height="374" alt="image" src="https://github.com/user-attachments/assets/341d8eda-e815-4404-8563-279ee924680c" />
+![img_10.png](img_10.png)
 
 To verify that the container and repository were functioning correctly, I entered the "run smoke test" prompt in the claude CLI.
 
 Actual Result:
 
-<img width="1887" height="1002" alt="image" src="https://github.com/user-attachments/assets/3c502cf0-2411-4b41-9b0c-444c2edb4c47" />
+![img_12.png](img_12.png)
 
 ## What the Smoke Test Verified
 
