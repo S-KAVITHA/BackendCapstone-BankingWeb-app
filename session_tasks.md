@@ -1,7 +1,6 @@
 # # Parallel Agent Session Tasks
 
-This document contains the commands required to orchestrate a two-session parallel agent workflow on your Target Codebase.
-If both containers shared the same mounted directory, one agent could overwrite another agent's changes before Git review, making ownership unclear and increasing the risk of unintentional conflicts.
+This document describes the parallel agent workflow for the target Codebase. Each agent runs in its own Git worktree, feature branch, and container mounted only to its assigned directory. This isolation prevents agents from overwriting each other's changes, reduces merge conflicts, and keeps ownership of changes clear during review.
 
 ## Session A
 
@@ -40,16 +39,18 @@ Create REST API controller test classes for `AdminController` and `CustomerContr
 Confirm the Repository is on the main branch and ensures that both worktrees branch off the same clean baseline, 
 which makes the final merge straightforward.
 
+```bash
 git checkout main
 git pull
 git worktree add ../target-agent-a -b feature/target-agent-a
+```
+![img_28.png](img_28.png)
 
 **Verify the worktrees :**
 
 ```bash
 git worktree list
 ```
-![img.png](img.png)
 
 verify worktree is on the correct branch:
 
@@ -58,8 +59,8 @@ cd ../target-agent-a
 ls
 git branch
 ```
-![img_4.png](img_4.png)
-![img_3.png](img_3.png)
+
+![img_16.png](img_16.png)
 
 Launch the container in the terminal 1:
 
@@ -70,18 +71,16 @@ backend-banking-capstone-app
 
 and use Claude inside container to execute the task
 
-![img_8.png](img_8.png)
-![img_1.png](img_1.png)
+![img_19.png](img_19.png)
 
 Actual Result:
 
-![img_2.png](img_2.png)
+![img_20.png](img_20.png)
 
 After both agents finish, use git status and git diff main commands in order to inspect each worktree separately against main.
 
-![img_4.png](img_4.png)
-
-![img_6.png](img_6.png)
+![img_21.png](img_21.png)
+![img_22.png](img_22.png)
 
 
 ## Session B
@@ -118,16 +117,20 @@ Update README.md with documentation describing the parallel multi-agent workflow
 Confirm the Repository is on the main branch and ensures that both worktrees branch off the same clean baseline,
 which makes the final merge straightforward.
 
+```bash
 git checkout main
 git pull
 git worktree add ../target-agent-b -b feature/target-agent-b
+```
+![img_17.png](img_17.png)
 
 **Verify the worktrees :**
 
 ```bash
 git worktree list
 ```
-![img_5.png](img_5.png)
+
+![img_29.png](img_29.png)
 
 verify worktree is on the correct branch:
 
@@ -148,11 +151,12 @@ backend-banking-capstone-app
 and use Claude inside container to execute the task
 
 ![img_7.png](img_7.png)
-![img_3.png](img_3.png)
+
+![img_23.png](img_23.png)
 
 After both agents finish, use git status and git diff main commands in order to inspect each worktree separately against main.
 
-![img_5.png](img_5.png)
+![img_24.png](img_24.png)
 
 ## Why These Tasks Can Run in Parallel
 
@@ -179,7 +183,6 @@ These files were intentionally excluded from both write scopes because modifying
 
 By keeping shared files read-only, each agent could independently complete its task while the final changes remained easy to review and merge.
 
-
 For each session, note the following:
 
 ## Merge Verification
@@ -197,7 +200,7 @@ git log --oneline -5
 ```
 The merge was performed only after reviewing each branch with `git diff main`. The final git log confirms that both feature branches were integrated into the main branch.
 
-![img_7.png](img_7.png)
+![img_25.png](img_25.png)
 
 ![img.png](img.png)
 
