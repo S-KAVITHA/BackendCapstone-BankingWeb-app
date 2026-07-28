@@ -7,6 +7,7 @@ This document contains the commands required to build, run, and verify the appli
 ```bash
 docker build -t backend-banking-capstone-app .
 ```
+
 -----------------------------------------------------------------------------------------------------------------
 
 ## 2. Run the Container
@@ -55,13 +56,13 @@ Actual result:
 -----------------------------------------------------------------------------------------------------------------
 ## 4. Smoke Test
 
-After entering the container, I launched the Claude CLI by running:
-  bash
+After entering the container, I launched the claude CLI by running:
+  ```bash
   claude
 
   <img width="1876" height="940" alt="image" src="https://github.com/user-attachments/assets/967cb166-4d01-4755-8d28-f19ff270e7b0" />
 
-Prompt executed in the Claude CLI:
+Prompt executed in the claude CLI:
   
 “List the files in /workspace and write a short summary of what this repo does to a file called summary.txt.”
 
@@ -76,11 +77,28 @@ Actual Result:
 
 <img width="947" height="374" alt="image" src="https://github.com/user-attachments/assets/341d8eda-e815-4404-8563-279ee924680c" />
 
-To verify that the container and repository were functioning correctly, I entered the "run smoke test" prompt in the Claude CLI.
+To verify that the container and repository were functioning correctly, I entered the "run smoke test" prompt in the claude CLI.
 
 Actual Result:
 
 <img width="1887" height="1002" alt="image" src="https://github.com/user-attachments/assets/3c502cf0-2411-4b41-9b0c-444c2edb4c47" />
+
+## What the Smoke Test Verified
+
+The smoke test confirmed that claude could access only the mounted `/workspace`
+directory and successfully created `summary.txt` there.
+
+After exiting the container, I verified that `summary.txt` existed in the project directory on the host (`ls summary.txt`), 
+confirming that writes inside `/workspace` persisted through the bind mount.
+
+When asked to access `/Users/user`, claude could not access that location because
+it was not mounted into the container.
+
+This verified that:
+
+- file writes were limited to the mounted project directory
+- host files outside the mount were inaccessible
+- the container respected the intended filesystem boundary
 
 ------------------------------------------------------------------------------------------------------------------
 ## 5. Project-Specific Security Decisions
@@ -89,7 +107,15 @@ Actual Result:
 
 **Decision:** Only the project directory is mounted as `/workspace`.
 
-**Reason:** Limits Claude's access to the banking application source code only.
+**Reason:** Only the BackendCapstone-BankingWeb-app directory is mounted into the
+container.
+
+Configuration files, Downloads, Documents, SSH keys, and other host directories
+remain inaccessible.
+
+This prevents accidental modification of unrelated files while claude edits the
+banking project.
+
 
 **Risk Prevented:** Without this boundary, a misbehaving agent or attacker could access unrelated host files, read sensitive documents, or modify files outside the banking application.
 
@@ -97,7 +123,7 @@ Actual Result:
 
 ### 2. Authentication Storage
 
-**Decision:** Claude authentication is stored in the `claude-auth` Docker volume.
+**Decision:** claude authentication is stored in the `claude-auth` Docker volume.
 
 **Reason:** Keeps authentication data separate from the project files and allows authentication to persist across container runs.
 
@@ -107,7 +133,7 @@ Actual Result:
 
 **Decision:** The container uses Docker's default bridge network.
 
-**Reason:** Allows outbound network access required for the Claude CLI to communicate with the Anthropic API.
+**Reason:** Allows outbound network access required for the claude CLI to communicate with the Anthropic API.
 
 **Risk Prevented:** Without controlled network access, a compromised agent could make unauthorized outbound requests, leak application data, or communicate with untrusted external services.
 
@@ -166,6 +192,6 @@ Actual Result:
 
 ### Agent Modification Risk
 
-**Risk:** Claude can modify files inside the mounted `/workspace` directory, which could introduce unintended changes to the banking application.
+**Risk:** claude can modify files inside the mounted `/workspace` directory, which could introduce unintended changes to the banking application.
 
 **Mitigation:** Review generated code changes before committing, use version control for rollback, and run automated tests after agent-assisted changes.
