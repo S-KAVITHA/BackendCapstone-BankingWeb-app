@@ -75,6 +75,10 @@ and use Claude inside container to execute the task
 
 Actual Result:
 
+![img_30.png](img_30.png)
+
+![img_31.png](img_31.png)
+
 ![img_20.png](img_20.png)
 
 After both agents finish, use git status and git diff main commands in order to inspect each worktree separately against main.
@@ -152,6 +156,12 @@ and use Claude inside container to execute the task
 
 ![img_7.png](img_7.png)
 
+![img_32.png](img_32.png)
+
+Actual Result:
+
+![img_33.png](img_33.png)
+
 ![img_23.png](img_23.png)
 
 After both agents finish, use git status and git diff main commands in order to inspect each worktree separately against main.
@@ -179,9 +189,7 @@ Both sessions were allowed to read shared files such as:
 - `pom.xml`
 - Existing application source files
 
-These files were intentionally excluded from both write scopes because modifying production code or shared configuration files in parallel could create merge conflicts or introduce unintended application changes.
-
-By keeping shared files read-only, each agent could independently complete its task while the final changes remained easy to review and merge.
+These files were excluded from write access because parallel changes to production code or shared configuration could create conflicts or unintended changes. Keeping them read-only allowed both agents to work independently and made merging safer.
 
 For each session, note the following:
 
