@@ -4,7 +4,10 @@
 This workflow uses a single agent inside a Docker container to run project validation tasks and report the results.
 
 ## Trigger
-The workflow starts when a developer requests a validation task such as running tests, building the application, or checking code quality.
+The workflow starts when a developer requests Maven test validation for the project.
+
+## Workflow Selection Justification
+Maven test execution was selected over broader code analysis tasks because it is deterministic, repeatable, and produces measurable pass/fail results within the container environment.
 
 ## Decision Events
 - If the build succeeds, record the successful build result.
@@ -19,7 +22,7 @@ The workflow starts when a developer requests a validation task such as running 
 5. Record findings in the iteration log.
 
 ## Acceptance Criteria
-- The agent completes the assigned validation task.
+- The agent executes mvn test, reports the exit status, and includes the number of passed and failed tests.
 - The command output is captured and reviewed.
 - The result can be classified as pass or fail using objective evidence.
 - The workflow does not modify unrelated project files.
