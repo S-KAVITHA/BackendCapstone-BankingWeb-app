@@ -29,6 +29,7 @@ Example: Tests were executed and failure causes were summarized.
 ## 2. Result Accuracy
 
 **Definition:** Measures whether the reported results match the actual command output.
+The agent must include Maven test evidence such as build exit status, total tests executed, passed tests, failed tests, and skipped tests when applicable.
 
 ### Score 1 - Does not meet
 The reported result does not match the actual output.
@@ -74,7 +75,7 @@ Example: Runs tests without modifying unrelated project files.
 ### Score 4 - Exceeds
 The agent follows scope and provides additional verification.
 
-Example: Runs tests, records evidence, and confirms no unexpected changes.
+Example: Runs tests, records evidence, and verifies no unexpected file changes using project status checks.
 
 ---
 
