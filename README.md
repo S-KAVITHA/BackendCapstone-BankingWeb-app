@@ -81,7 +81,7 @@ docker run -it --rm \
 Repeat with the corresponding worktree path, container `--name`, and `claude-auth-*` volume for
 each agent (`agent-customers`, `agent-accounts`, `agent-db`, ...). Because each container only
 mounts its own worktree, an agent can only read/write the files for its module — see
-[`setup.md`](setup.md) for the filesystem/network isolation decisions this relies on. Containers
+[`prd.md`](setup.md) for the filesystem/network isolation decisions this relies on. Containers
 can run concurrently on the same host; use `--network none` for any agent that doesn't need
 outbound access.
 
