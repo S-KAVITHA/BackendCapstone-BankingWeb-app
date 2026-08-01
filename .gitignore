@@ -33,3 +33,4 @@ build/
 .vscode/
 google_cred.json
 token.json
+echo "gcp-oauth.keys.json" >> .gitignore
