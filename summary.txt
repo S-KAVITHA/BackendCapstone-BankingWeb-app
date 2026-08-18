@@ -1,0 +1,32 @@
+Repository summary: BankingProject_Backend
+
+This is the backend for an Online Internet Banking Web Application (a capstone
+project), built with Java 8 and Spring Boot (2.1.6). It uses Spring Data
+JPA/Hibernate for persistence against a MySQL database, and exposes REST
+endpoints via Spring Boot Web / Spring Data REST.
+
+Key features:
+- Customer registration, login, and profile management
+- Account management (open savings/current accounts, view balances)
+- Deposits, withdrawals, and transaction history
+- Funds transfers between accounts and recipient management
+- Cheque book requests
+- Administrator workflows: approve/reject registrations, accounts,
+  transactions, transfers, and cheque requests; block users
+
+Architecture: a layered Spring Boot structure with controllers (REST
+endpoints), services (business logic), repositories (Spring Data JPA data
+access), and model/entity classes for the relational schema. Customer-facing
+and admin-facing functionality are kept separate.
+
+Top-level layout:
+- src/               Java source code (main application)
+- pom.xml            Maven build/dependency configuration
+- mvnw, mvnw.cmd      Maven wrapper scripts
+- Dockerfile, docker-entrypoint.sh   Containerization setup
+- README.md          Project description
+- setup.md           Setup instructions
+- settings.json, statusline.sh   Tooling/config files (Claude Code session)
+- img_*.png          Screenshots/diagrams
+- .idea/, .mvn/, .git/, .claude/, target/   IDE, Maven, git, tooling, and
+  build-output directories
