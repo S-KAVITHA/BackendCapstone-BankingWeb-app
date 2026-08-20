@@ -15,3 +15,32 @@ After reviewing Run 001, the workflow was refined with one prompt improvement: t
 
 ### Workflow Stability
 Run 002 successfully verified the test suite with structured and comprehensive metrics. The agent fully respected the no-modification constraint and confirmed that all tests passed successfully, keeping the workflow stable and reliable.
+
+
+| Run ID  | Date       | Task                        | Agent/Tool | Prompt/Command                                                                                                                                                                                                                                         | Cycle Time | Rubric Scores                                                                                                                                                       | Pass/Fail | Review Latency |  Cost | Observations                                                                                                                        |
+|---------|------------|-----------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------------:|------:|-------------------------------------------------------------------------------------------------------------------------------------|
+| Run 003 | 2026-08-17 | Run Maven test suite        | Claude     | `time claude "Run the Maven test suite for this project. Do not modify any files. Report the Maven exit status, total tests, passed tests, failed tests, and skipped tests."`                                                                          |        53s | Task Completion: 4 (completed requested validation); Result Accuracy: 4 (reported results matched Maven output); Scope Compliance: 4 (no unrelated project changes) | Pass      |            ~2m | $0.29 | Maven test command completed successfully with exit status 0 (BUILD SUCCESS) and correctly ran all 46 tests across controllers and services, resulting in 0 failures, 0 errors, and 0 skipped tests. |
+| Run 004 | 2026-08-17 | Run Maven Checkstyle plugin | Claude     | `time claude "Run the Checkstyle plugin using Maven (e.g., mvnw checkstyle:check or checkstyle:checkstyle) and summarize the lint results, reporting the total violations, categories, and any errors or warnings found. Write the results to docs/lint-report.md. Do not fix any errors or modify any source files."` |     2m 09s | Task Completion: 4 (completed requested validation); Result Accuracy: 4 (reported results matched Maven output); Scope Compliance: 4 (no unrelated project changes) | Pass      |            ~2m | $0.35 | Checkstyle ran successfully using the default Sun checks ruleset, finding 982 total violations, primarily missing Javadocs and model class styling. The full summary was saved to docs/lint-report.md.|
+
+Output of git log --oneline:
+
+## Git Log
+
+```
+user@DESKTOP-A52GAEQ:/mnt/c/Users/User/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$  git log --oneline
+1f51fe6 (HEAD -> main, origin/main, origin/HEAD) Merge branch 'feature/agent-b'
+4a8a805 (feature/agent-b) docs: add lint-report.md in target-agent-b
+57d4fba docs: update iteration-log with second workflow run
+7d34c8c docs: update iteration-log with baseline run
+82df66e docs: add iteration-log template
+f7e693a docs: add evaluation rubric
+3a0abf1 docs: add PRD for single-agent workflow
+c68d737 Define parallel agent session tasks
+4daaac8 "Merge branch 'feature/agent-b'"
+223b474 docs: add README.md in target-agent-b
+a081734 (feature/agent-a) test: add AdminControllerTest and CustomerControllerTest in target-agent-a
+e12e3d9 Build a Sandbox for Coding Agent
+18e5ad4 first commit
+user@DESKTOP-A52GAEQ:/mnt/c/Users/User/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$```
+
+

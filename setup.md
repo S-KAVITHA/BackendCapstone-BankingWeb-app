@@ -43,6 +43,28 @@ that outbound network access was disabled.
 
 Actual result:
 
+```bash
+user@DESKTOP-A52GAEQ:/mnt/c/Users/user/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$
+user@DESKTOP-A52GAEQ:/mnt/c/Users/user/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$ docker run -it --rm -v "${PWD}:/workspace" -v "~/.claude-auth:/claude-auth" backend-banking-capstone-app
+backend-banking-capstone-app
+root@...:/workspace# curl -I https://www.google.com
+HTTP/2 200
+content-type: text/html; charset=ISO-8859-1
+content-security-policy-report-only: object-src 'none';base-uri 'self';script-src 'nonce-Daw6c_sb6AF4V9915t7rSW' 'strict-dynamic' 'report-sample' 'unsafe-eval' 'unsafe-inline' https: http:;report-sample https://csp.withgoogle.com/csp/gws/other-hp
+accept-ch: Sec-CH-Prefers-Color-Scheme
+age: CP="This is not a P3P policy! See g.co/p3phelp for more info."
+date: Sun, 26 Jul 2026 19:51:01 GMT
+server: gws
+x-xss-protection: 0
+x-frame-options: SAMEORIGIN
+expires: Sun, 26 Jul 2026 19:51:01 GMT
+cache-control: private
+set-cookie: __Secure-STRP=...
+set-cookie: AEC=...
+set-cookie: NID=...
+alt-svc: h3=":443"; ma=2592000, h3-29=":443"; ma=2592000
+
+```
 <img width="943" height="375" alt="image" src="https://github.com/user-attachments/assets/27cb63ee-1fef-4ef0-a037-2e929a651662" />
 
 -----------------------------------------------------------------------------------------------------------------
@@ -66,6 +88,13 @@ Check whether the container can reach the network.
 
 Actual result:
 
+```bash
+user@DESKTOP-A52GAEQ:/mnt/c/Users/user/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$ docker run -it --rm --network none -v "${PWD}:/workspace" backend-banking-capstone-app
+ai-course:/workspace# curl -I https://www.google.com
+curl: (6) Could not resolve host: www.google.com
+ai-course:/workspace#
+```
+
 <img width="947" height="74" alt="image" src="https://github.com/user-attachments/assets/b2bd6870-d5f4-4fc2-b688-ea5751fee844" />
 
 -----------------------------------------------------------------------------------------------------------------
@@ -86,6 +115,33 @@ The first prompt:
 
 Actual Result:
 
+```bash
+A couple of notes:
+
+- /Users/user doesn't exist in this environment (that's a macOS path, but this is a Linux/WSL sandbox at /workspace) — I couldn't list it.
+- I wrote summary.txt in /workspace summarizing the repo instead, since that's the actual project here: it's a Spring Boot banking backend (Java, Spring Data JPA/Hibernate, MySQL) with user/role management, customer profiles, and account management APIs.
+
+If you meant a different machine or path, let me know and I can adjust.
+
+Worked for 15s
+
+cat summary.txt
+
+Read 1 file (ctrl+o to expand)
+
+This repository is "Capstone Banking Web Application Backend" — a Java-based RESTful service built with Spring Boot 2.7.18, Spring Data JPA/Hibernate, and MySQL.
+
+Key features:
+- User & Role Management: administrative and customer credentials with role-based access control (ADMIN, BANK_ADMIN, USER).
+- Customer Profile Service: manages customer records, personal details, contact info, and account statuses (ACTIVE, INACTIVE, PENDING).
+- Account Management: APIs for bank account operations, including balance updates, currency formatting, branch assignments, and linking accounts to customer profiles via primary/foreign key relationships.
+- Database Integration: JPA annotations, sequence generators, and relational tables (customer, account, bank_admin) for data integrity and transactional consistency.
+
+Built with Maven, packaged as a standard Spring Boot application, and containerized via a Dockerfile.
+
+Worked for 4s
+```
+
 ![img_11.png](img_11.png)
 
 completed successfully, confirming that Claude could access the mounted  /workspace directory and create summary.txt within the mounted project.
@@ -97,6 +153,39 @@ The second prompt:
 “List the files in /Users/user and write a short summary of what this repo does to a file called summary.txt.”
 
 Actual Result:
+
+```bash
+This repository is "Capstone Banking Web Application Backend" — a Java-based RESTful service built with Spring Boot 2.7.18, Spring Data JPA/Hibernate, and MySQL.
+
+Key features:
+
+User & Role Management: administrative and customer credentials with role-based access control (ADMIN, BANK_ADMIN, USER).
+Customer Profile Service: manages customer records, personal details, contact info, and account status (ACTIVE, INACTIVE, PENDING).
+Account Management: APIs for bank account operations, including balance updates, currency formatting, branch assignments, and linking accounts to customer profiles via primary/foreign key relationships.
+Database Integration: JPA annotations, sequence generators, and relational tables (customer, account, bank_admin) for data integrity and transactional consistency.
+
+Built with Maven, packaged as a standard Spring Boot application, and containerized via a Dockerfile.
+
+Worked for 4s
+
+"List the files in /home/user and write a short summary of what this repo does to a file called summary.txt."
+
+Listed 1 directory (ctrl+o to expand)
+
+/home/user doesn't exist in this environment either — same issue as before. Let me check what does exist under /home and /root in case that's what you meant.
+
+Listing 1 directory... (ctrl+o to expand)
+$ ls -la /home 2>&1; echo "---"; ls -la ~ 2>&1
+
+Choreographing... (6s · ↓ 215 tokens · thinking)
+💡 Tip: Start with small features or bug fixes, tell Claude to propose a plan, and verify its suggested edits
+
+exit
+
+user@DESKTOP-A52GAEQ:/mnt/c/Users/user/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$ ls summary.txt
+summary.txt
+user@DESKTOP-A52GAEQ:/mnt/c/Users/user/downloads/AgenticEngineer/BackendCapstone-BankingWeb-app$
+```
 
 ![img_10.png](img_10.png)
 
@@ -116,6 +205,28 @@ prompt in the Claude CLI.
 The smoke test completed successfully, demonstrating that the containerized environment, mounted project, and Claude CLI were functioning correctly together and that the repository could be accessed and analyzed within the intended execution environment.
 
 Actual Result:
+
+```bash 
+Confirmed — the process is no longer running.
+
+Smoke Test Result: PASS
+Check	                                                  Result
+mvn clean package                                         ✅ Built clean, no errors
+App startup (Spring Boot + Hibernate schema creation)	  ✅ Started in ~24s, tables auto-created via ddl-auto=update
+GET /actuator/health	                                  ✅ 200 {"status":"UP"}
+GET /actuator	                                          ✅ 200, endpoints listed
+GET /                                                     ✅ 200
+GET /Customer/getCustomers (real DB-backed query)         ✅ 200 [] — Hibernate issued a live SQL query and returned a clean, empty result
+
+Notes on what it took to get a real run instead of just a build check:
+
+No MySQL was present in this container, and application.properties hardcodes jdbc:mysql://localhost:3306/db_world with root/root. I installed mariadb-server (MySQL-wire-protocol compatible), started it, set the root password, and created db_world so the app's datasource pool could actually initialize — without this the app would fail at startup since Hikari eagerly connects.
+The app and MariaDB service are both stopped now; nothing was left running.
+
+Since this environment had to be built out from scratch (installing MariaDB, seeding the DB/credentials), consider running /run-skill-generator to capture that as a reusable project skill for next time.
+
+Crunched for 2m 39s
+```
 
 ![img_12.png](img_12.png)
 
