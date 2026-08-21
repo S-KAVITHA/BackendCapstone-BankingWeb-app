@@ -5,10 +5,7 @@ WORKDIR /workspace
 # Target-codebase requirements:
 # Java 8 + Maven: Spring Boot banking backend and pom.xml
 # curl: network boundary verification
-# git: review/rollbac
-
-
-k of agent changes
+# git: review/rollback of agent changes
 # Node.js/npm + Claude Code: agentic engineering workflow
 
 
