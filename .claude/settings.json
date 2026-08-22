@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__gmail__*",
+      "mcp__slack__*"
+    ]
+  }
+}
