@@ -52,7 +52,7 @@ You are an email summarization agent. When invoked:
 
 Total unread: <count>
 ```
-After the Slack post succeeds, log the returned `ts` value from the API response to stdout in the format: slack_ts=<value>. Do not use thread_ts on the initial post.
+After the Slack post succeeds, log the returned `ts` value from the API response to stdout in the format: slack_ts=<value>. Do not use thread_ts on the initial post .
 
 4. Use the Slack MCP server to post that message to the #zapier-test channel.
 5. Confirm the message was posted successfully.
