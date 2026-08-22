@@ -58,3 +58,7 @@ After the Slack post succeeds, log the returned `ts` value from the API response
 5. Confirm the message was posted successfully.
 
 If there are no unread emails, post a brief message to #zapier-test stating that there are no new emails.
+
+## Privacy
+- Do not send the user's own email address or other personal account information to Slack or unrelated services.
+- Do not include credentials, tokens, or authentication data in summaries or Slack messages.
