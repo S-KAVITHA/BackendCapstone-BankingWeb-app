@@ -1,0 +1,24 @@
+# Reflection Report: `email-summarize` — run-2.jsonl
+
+## Session Summary
+User asked the top-level agent to fetch unread Gmail, summarize each message, post to `#zapier-test`, and confirm success. The orchestrator invoked the `email-summarize` subagent with a detailed prompt. The subagent found 13 unread emails, produced a formatted numbered summary (2 sentences each, ≤20 words/sentence, capped at first 500 chars), posted it as a new top-level message to `#zapier-test`, returned `slack_ts=1787432608.436169`, and confirmed the post via the Slack API's `ok:true`/`channel`/`ts` fields.
+
+## Rubric Scores
+
+**1. Task Completion — Score 4 (Exceeds)**
+The agent completed every required step (fetch → summarize → format → post → log `slack_ts` → confirm) and went beyond the minimum by categorizing the batch in its notes ("mix of LinkedIn job alerts, LinkedIn Learning recommendations, Indeed job alerts, a Google account-sharing notice, and two Canvas/Instructure grading notifications"), which is exactly the kind of added analysis the rubric's Score-4 example describes.
+
+**2. Result Accuracy — Score 4 (Exceeds)**
+The reported `slack_ts=1787432608.436169` and channel `C0AR149EBST` are drawn directly from the Slack API response (`"ok":true`), and manually recounting all 13 summary pairs confirms every sentence is ≤20 words (two entries hit exactly 20, none exceed it) and each entry has exactly two sentences, matching the agent's own claims about compliance.
+
+**3. Scope Compliance — Score 4 (Exceeds)**
+The agent restricted itself to Gmail and Slack MCP tools and explicitly self-verified this in its final notes ("No files were created; only Gmail (search_emails, read_email) and Slack (list_channels, post_message) MCP tools were used"), which mirrors the rubric's Score-4 example of proactively verifying no unexpected side effects occurred.
+
+## Misfires
+None identified. Every explicit constraint in the agent definition (`.claude/agents/email-summarize.md`) — Gmail/Slack-only tools, 2-sentence/20-word summaries, 500-character cap, no `thread_ts` on the initial post, `slack_ts` logging, explicit confirmation — was satisfied and independently verifiable from the transcript's tool-result payload. Per instructions, no diffs are proposed since no dimension scored below 4 and no misfire is evidenced.
+
+## Non-Scored Observation (no diff proposed)
+The privacy constraint — "do not send the user's own email address to an unrelated service" — that governed this run's safe behavior originated from the orchestrator's ad hoc prompt and the system context, not from `.claude/agents/email-summarize.md` itself, which contains no such rule. In this run it caused no problem because the user's address never appeared as a sender/recipient, so this is not a misfire and no diff is proposed here; it is flagged only as a latent gap worth the developer's attention if the subagent is ever invoked without that orchestrator-level reminder.
+
+## Summary
+**Overall: 4/4/4 — PASS.** No misfires evidenced; the most impactful potential future change (not proposed as a diff here, since no misfire occurred) would be adding an explicit user-email-privacy clause to `.claude/agents/email-summarize.md` so protection doesn't depend on the caller repeating it.
