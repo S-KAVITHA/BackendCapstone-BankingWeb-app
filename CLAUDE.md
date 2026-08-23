@@ -16,3 +16,13 @@ At the start of each new phase, before doing any editing or analysis:
 
 ## Why This Matters
 Rules and requirements change during long sessions. This procedure ensures the agent is always operating from the current version of the rules, not a prior version buried in conversation history.
+
+## Compaction Policy
+
+Compaction is a last resort. Proactive summarization (see .claude/skills/summarize-session/SKILL.md) should be triggered before the context window exceeds 60% capacity to avoid relying on compaction.
+
+Observations from testing (update this based on your own runs):
+- Compaction reliably preserves: [fill in based on your probe results]
+- Compaction may lose or distort: [fill in based on your probe results]
+- Manual compaction should be triggered at: [fill in your threshold]
+  Fill in the bracketed sections based on your actual probe results. 
