@@ -29,7 +29,7 @@ The **Making Requests** and **Error Handling** sections have not yet been edited
 > Errors in API integrations are often caused by network issues, invalid input, or rate limiting applied by the provider. It is recommended that retry logic be implemented with exponential backoff for transient errors. Permanent errors, such as 404 or 400 responses, should be surfaced to the user rather than retried.
 
 ### Rules and Constraints in Effect
-Copied verbatim from the user's original message. No rule changes have occurred during Phase One — these are the only rules that have ever been in effect in this workflow:
+Copied verbatim from the user's Phase One instructions. No rule changes occurred during Phase One. These are the rules currently in effect for Phase Two:
 
 > STYLE GUIDE (apply to all edits):
 > - Never use passive voice. Always rewrite passive constructions as active voice.
