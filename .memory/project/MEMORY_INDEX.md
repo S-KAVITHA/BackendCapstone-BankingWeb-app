@@ -1,18 +1,17 @@
 # Project Memory Index
 
-Last updated: [today's date]
+Last updated: 2026-08-25
 
 ## Active entries
 
-(none yet)
+- [decisions/decision-001.md](decisions/decision-001.md) — Tests remain under `src/test/java` using the existing Maven package structure.
+- [decisions/decision-002.md](decisions/decision-002.md) — Backend code remains compatible with Java 8.
 
 ## Archived entries
 
-(none yet)
+None.
 
 ## Pruning schedule
 
-- Workflow-scoped entries: archived when the branch merges to main
-- Project-scoped entries: reviewed every 90 days
-
-Then show me the file contents to confirm.
+- Workflow-scoped entries: archived when the branch merges to main and the information is no longer needed.
+- Project-scoped entries: reviewed when the decision or project priority changes.
