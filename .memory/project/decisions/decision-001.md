@@ -4,13 +4,13 @@
 2026-08-25
 
 ## Review by
-2026-11-23
+2026-11-26
 
 ## Status
 Active
 
 ## Decision
-Tests are maintained under `src/test/java`, following the project's existing package structure.
+Tests are maintained under `src/test/java`, following the project's existing Maven package structure.
 
 ## Rationale
 This follows the Maven project structure and allows the existing build configuration to discover and run tests without additional configuration. It keeps the current test organization consistent.
