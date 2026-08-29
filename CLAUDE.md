@@ -84,3 +84,10 @@ match this project, halt and report the mismatch before doing
 anything else.
 
 Then confirm the file was created and show me its contents.
+
+### Memory Scope Policy
+
+Every project-memory entry must identify the agent, workflow, or task scope for which it is authoritative.
+Before applying a memory entry, verify that its declared scope matches the current agent and task.
+An agent must not apply a memory entry to a different agent, workflow, or task unless the entry explicitly declares that broader scope.
+If the scope is missing, ambiguous, or does not match the current task, treat the entry as non-authoritative and request confirmation before using it.

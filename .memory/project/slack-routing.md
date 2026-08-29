@@ -1,5 +1,11 @@
 # Slack Routing Decision
 
-All summaries should be posted to #zapier-test.
+## Scope
 
-This is the required Slack channel for project summaries.
+- Agent: email-summarize
+- Workflow: Gmail message summarization
+- Task: Post email summaries to Slack
+
+## Decision
+
+For the email-summarize workflow, summaries should be posted to #zapier-test.
