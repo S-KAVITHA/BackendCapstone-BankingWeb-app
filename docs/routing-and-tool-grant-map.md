@@ -1,6 +1,6 @@
 # Routing and Tool Grant Map
 
-Project: `BackendCapstone-BankingWeb-app`
+Project:  `BackendCapstone-BankingWeb-app`
 
 This map defines the delegation flow and tool boundaries for the banking bug-fix
 workflow. Agent definitions in `.claude/agents/` should match this map.
