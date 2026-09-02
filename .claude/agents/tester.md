@@ -6,15 +6,15 @@ description: >
 model: sonnet
 
 tools:
- - file-read
- - test-runner
+ - mcp__coursetools__file-read
+ - mcp__coursetools__test-runner
 
 disallowedTools:
- - file-write
- - codebase-search
- - shell
- - task-tracker
- - web-search
+ - mcp__coursetools__file-write
+ - mcp__coursetools__codebase-search
+ - mcp__coursetools__shell
+ - mcp__coursetools__task-tracker
+ - mcp__coursetools__web-search
 
 autonomy: medium
 version: 1.1.0
