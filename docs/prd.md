@@ -41,6 +41,8 @@ Maven tests provide deterministic pass/fail results, while Checkstyle provides m
 ## Isolation
 Agent A and Agent B each use a separate branch, worktree, and Docker container. Each container mounts only its assigned worktree, and isolation is verified for both containers.
 
+---
+
 ## Agent A — Maven Test
 
 ## Actions
@@ -51,6 +53,8 @@ If the build succeeds, record the successful test result. If tests fail, record 
 
 ## Acceptance Criteria
 Maven tests execute successfully or failures are documented; exit status and test counts are reported with command evidence; no unrelated files are modified.
+
+---
 
 ## Agent B — Checkstyle
 

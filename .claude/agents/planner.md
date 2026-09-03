@@ -7,15 +7,15 @@ write code, modify files, or run tests.
 model: sonnet
 
 tools:
-- mcp__coursetools__file-read
-- mcp__coursetools__codebase-search
+- mcp__coursetools__file_read
+- mcp__coursetools__codebase_search
 
 disallowedTools:
-- mcp__coursetools__file-write
+- mcp__coursetools__file_write
 - mcp__coursetools__shell
-- mcp__coursetools__test-runner
-- mcp__coursetools__task-tracker
-- mcp__coursetools__web-search
+- mcp__coursetools__test_runner
+- mcp__coursetools__task_tracker
+- mcp__coursetools__web_search
 
 autonomy: high
 version: 1.1.0
@@ -49,3 +49,14 @@ When invoked:
 - Next role: the orchestrator passes the plan and file list to the Implementer.
 - Re-invocation: only if the orchestrator determines the plan is incomplete,
   incorrect, or out of scope.
+
+## Required output format
+Return exactly two sections, in this order:
+
+### Plan
+1. <first step>
+2. <second step>
+
+### Files to change
+- <path/to/file> — <what changes>
+  version: 1.3.0   # was 1.2.0; bumped for the output-format fix
