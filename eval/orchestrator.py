@@ -541,6 +541,7 @@ def run_orchestrator(
     print(f"Running orchestration: {expected_path}", flush=True)
 
     for step, role in enumerate(expected_path, start=1):
+
         role_start = time.time()
         next_handoff, output_doc, review_items, tool_events = run_role(
             client=client,
@@ -552,7 +553,22 @@ def run_orchestrator(
             audit_entries=audit_entries,
             canary=canary,
         )
-        role_elapsed = time.time() - role_start
+
+        # Record all tool calls for this role
+        transcript_events.extend(tool_events)
+
+        # Record the subagent event
+        subagent_event: dict = {
+            "type": "subagent",
+            "role": role,
+            "step": step,
+            "handoff": next_handoff,
+            "output_document": output_doc,
+            "review_items": review_items,
+        }
+
+        transcript_events.append(subagent_event)
+        handoff = next_handoff
 
         # Record all tool calls for this role
         transcript_events.extend(tool_events)
