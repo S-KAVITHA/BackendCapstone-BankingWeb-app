@@ -158,55 +158,80 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+
+# Mirrors mcp/retrieval/server.py's SIMILARITY_THRESHOLD: vector matches below
+# this floor are not good enough to return as-is; the server falls back to
+# keyword search instead of surfacing a weak match.
+SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVAL_SIMILARITY_THRESHOLD", "0.65"))
+
+_SIM_VECTOR_CANDIDATES = [
+    {
+        "source_document": "incident-report-2024-q3.md",
+        "chunk_index": 0,
+        "excerpt": (
+            "Rate limit incident Q3 2024: API consumers were not warned 24 hours before "
+            "the rate limit threshold was lowered from 1000 to 500 requests per minute. "
+            "Several clients experienced outages lasting 2-4 hours."
+        ),
+        "classification": "internal",
+        "retrieval_method": "vector",
+        "similarity": 0.87,
+    },
+    {
+        "source_document": "postmortem-lessons.md",
+        "chunk_index": 2,
+        "excerpt": (
+            "Lessons learned: (1) All limit changes require 72-hour advance notice. "
+            "(2) Clients must have a documented escalation path. "
+            "(3) Rate limit headers should be included in all API responses."
+        ),
+        "classification": "internal",
+        "retrieval_method": "vector",
+        "similarity": 0.82,
+    },
+    {
+        "source_document": "api-design-guidelines.md",
+        "chunk_index": 5,
+        "excerpt": (
+            "API versioning policy: breaking changes require a deprecation notice period "
+            "of at least 30 days. Rate limit adjustments are considered breaking changes "
+            "when they reduce the existing limit."
+        ),
+        "classification": "public",
+        "retrieval_method": "vector",
+        "similarity": 0.30,
+    },
+]
+
+_SIM_KEYWORD_FALLBACK = {
+    "source_document": "api-design-guidelines.md",
+    "chunk_index": 5,
+    "excerpt": (
+        "API versioning policy: breaking changes require a deprecation notice period "
+        "of at least 30 days. Rate limit adjustments are considered breaking changes "
+        "when they reduce the existing limit."
+    ),
+    "classification": "public",
+    "retrieval_method": "keyword",
+    "similarity": None,
+}
+
+
 def _sim_retrieve(inputs: dict) -> dict:
-    """Return realistic fake retrieval results (above the 0.65 similarity floor)."""
-    return {
-        "results": [
-            {
-                "source_document": "incident-report-2024-q3.md",
-                "chunk_index": 0,
-                "excerpt": (
-                    "Rate limit incident Q3 2024: API consumers were not warned 24 hours before "
-                    "the rate limit threshold was lowered from 1000 to 500 requests per minute. "
-                    "Several clients experienced outages lasting 2-4 hours."
-                ),
-                "classification": "internal",
-                "retrieval_method": "vector",
-                "similarity": 0.87,
-            },
-            {
-                "source_document": "postmortem-lessons.md",
-                "chunk_index": 2,
-                "excerpt": (
-                    "Lessons learned: (1) All limit changes require 72-hour advance notice. "
-                    "(2) Clients must have a documented escalation path. "
-                    "(3) Rate limit headers should be included in all API responses."
-                ),
-                "classification": "internal",
-                "retrieval_method": "vector",
-                "similarity": 0.82,
-            },
-            {
-                "source_document": "api-design-guidelines.md",
-                "chunk_index": 5,
-                "excerpt": (
-                    "API versioning policy: breaking changes require a deprecation notice period "
-                    "of at least 30 days. Rate limit adjustments are considered breaking changes "
-                    "when they reduce the existing limit."
-                ),
-                "classification": "public",
-                "retrieval_method": "vector",
-                "similarity": 0.74,
-            },
-        ]
-    }
+    """Simulate the retrieval server: only vector matches at or above the
+    similarity floor are returned; if none clear it, fall back to keyword
+    search rather than returning a weak vector match as if it were good."""
+    strong = [r for r in _SIM_VECTOR_CANDIDATES if r["similarity"] >= SIMILARITY_THRESHOLD]
+    if strong:
+        return {"results": strong}
+    return {"results": [_SIM_KEYWORD_FALLBACK]}
 
 
-def _sim_write_entry(inputs: dict, calling_role: str, audit_entries: list) -> dict:
+def _sim_write_entry(inputs: dict, project_id: str, calling_role: str, audit_entries: list) -> dict:
     entry_id = str(uuid.uuid4())
     _entry_store[entry_id] = {
         "entry_id": entry_id,
-        "project_id": inputs["project_id"],
+        "project_id": project_id,
         "entry_type": inputs["entry_type"],
         "title": inputs["title"],
         "content": inputs["content"],
@@ -216,7 +241,7 @@ def _sim_write_entry(inputs: dict, calling_role: str, audit_entries: list) -> di
     audit_entries.append({
         "timestamp": _utc_now(),
         "operation": "write_entry",
-        "project_id": inputs["project_id"],
+        "project_id": project_id,
         "entry_id": entry_id,
         "classification": inputs["classification"],
         "calling_role": calling_role,
@@ -224,11 +249,11 @@ def _sim_write_entry(inputs: dict, calling_role: str, audit_entries: list) -> di
     return {"entry_id": entry_id}
 
 
-def _sim_read_entry(inputs: dict, calling_role: str, audit_entries: list) -> dict:
+def _sim_read_entry(inputs: dict, project_id: str, calling_role: str, audit_entries: list) -> dict:
     entry_id = inputs.get("entry_id", "")
     entry = _entry_store.get(entry_id, {
         "entry_id": entry_id,
-        "project_id": inputs["project_id"],
+        "project_id": project_id,
         "entry_type": "decision",
         "title": "API validation rule",
         "content": (
@@ -241,7 +266,7 @@ def _sim_read_entry(inputs: dict, calling_role: str, audit_entries: list) -> dic
     audit_entries.append({
         "timestamp": _utc_now(),
         "operation": "read_entry",
-        "project_id": inputs["project_id"],
+        "project_id": project_id,
         "entry_id": entry_id,
         "classification": entry.get("classification", "internal"),
         "calling_role": calling_role,
@@ -249,8 +274,7 @@ def _sim_read_entry(inputs: dict, calling_role: str, audit_entries: list) -> dic
     return entry
 
 
-def _sim_list_entries(inputs: dict) -> list:
-    project_id = inputs.get("project_id", "")
+def _sim_list_entries(inputs: dict, project_id: str) -> list:
     stored = [e for e in _entry_store.values() if e["project_id"] == project_id]
     if stored:
         return stored
@@ -266,7 +290,7 @@ def _sim_list_entries(inputs: dict) -> list:
     ]
 
 
-def _sim_update_entry(inputs: dict, calling_role: str, audit_entries: list) -> dict:
+def _sim_update_entry(inputs: dict, project_id: str, calling_role: str, audit_entries: list) -> dict:
     entry_id = inputs.get("entry_id", "")
     classification = "internal"
     if entry_id in _entry_store:
@@ -276,7 +300,7 @@ def _sim_update_entry(inputs: dict, calling_role: str, audit_entries: list) -> d
     audit_entries.append({
         "timestamp": _utc_now(),
         "operation": "update_entry",
-        "project_id": inputs["project_id"],
+        "project_id": project_id,
         "entry_id": entry_id,
         "classification": classification,
         "calling_role": calling_role,
@@ -284,14 +308,14 @@ def _sim_update_entry(inputs: dict, calling_role: str, audit_entries: list) -> d
     return {"success": True}
 
 
-def _sim_delete_entry(inputs: dict, calling_role: str, audit_entries: list) -> dict:
+def _sim_delete_entry(inputs: dict, project_id: str, calling_role: str, audit_entries: list) -> dict:
     entry_id = inputs.get("entry_id", "")
     entry = _entry_store.pop(entry_id, {})
     classification = entry.get("classification", "internal")
     audit_entries.append({
         "timestamp": _utc_now(),
         "operation": "delete_entry",
-        "project_id": inputs["project_id"],
+        "project_id": project_id,
         "entry_id": entry_id,
         "classification": classification,
         "calling_role": calling_role,
@@ -310,15 +334,15 @@ def execute_tool(
     if tool_name == "retrieve":
         result = _sim_retrieve(inputs)
     elif tool_name == "write_entry":
-        result = _sim_write_entry(inputs, role, audit_entries)
+        result = _sim_write_entry(inputs, project_id, role, audit_entries)
     elif tool_name == "read_entry":
-        result = _sim_read_entry(inputs, role, audit_entries)
+        result = _sim_read_entry(inputs, project_id, role, audit_entries)
     elif tool_name == "list_entries":
-        result = _sim_list_entries(inputs)
+        result = _sim_list_entries(inputs, project_id)
     elif tool_name == "update_entry":
-        result = _sim_update_entry(inputs, role, audit_entries)
+        result = _sim_update_entry(inputs, project_id, role, audit_entries)
     elif tool_name == "delete_entry":
-        result = _sim_delete_entry(inputs, role, audit_entries)
+        result = _sim_delete_entry(inputs, project_id, role, audit_entries)
     else:
         result = {"error": f"unknown tool: {tool_name}"}
 
@@ -556,23 +580,6 @@ def run_orchestrator(
 
         # Record all tool calls for this role
         transcript_events.extend(tool_events)
-
-        # Record the subagent event
-        subagent_event: dict = {
-            "type": "subagent",
-            "role": role,
-            "step": step,
-            "handoff": next_handoff,
-            "output_document": output_doc,
-            "review_items": review_items,
-        }
-
-        transcript_events.append(subagent_event)
-        handoff = next_handoff
-
-        # Record all tool calls for this role
-        transcript_events.extend(tool_events)
-
 
         # Record the subagent event
         subagent_event: dict = {
