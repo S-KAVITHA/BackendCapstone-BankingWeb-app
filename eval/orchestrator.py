@@ -396,6 +396,8 @@ After you finish using tools, output your final response as a JSON block in this
 
 For reviewer, reviewer_strict, or reviewer_lenient roles, populate review_items like:
 [{"section": "implementation", "verdict": "approve"}]
+The verdict value for every review_items entry must be exactly "approve" or "reject" — no
+other wording, qualifiers, or hedged phrasing.
 
 For roles using retrieve, list the source_document names in citation_list.
 """
