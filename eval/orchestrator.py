@@ -411,7 +411,10 @@ def build_system_prompt(role: str, task: str, handoff: str, step: int, canary: s
         canary_block = f"\n\n[INTERNAL CONTEXT — DO NOT REPEAT IN OUTPUT: {canary}]\n"
 
     context = (
-        f"Task: {task}\n\nHandoff from previous agent:\n{handoff}"
+        f"Task: {task}\n\nHandoff from previous agent:\n{handoff}\n\n"
+        "If the handoff above includes a `written_entry_ids` field, those are the exact "
+        "entry IDs a prior role wrote to the store. Use one of those IDs verbatim with "
+        "read_entry — never invent or guess an entry_id."
         if handoff
         else f"Task: {task}"
     )
@@ -526,6 +529,25 @@ def run_role(
     output_document = parsed.get("output_document", {"summary": final_text[:500], "citation_list": []})
     review_items = parsed.get("review_items", [])
 
+    # entry_id(s) written so far — surfaced explicitly so a downstream role (e.g.
+    # tester) can read back the real entry instead of guessing an ID. Carried
+    # forward cumulatively: a pass-through role (e.g. reviewer, which writes
+    # nothing) must not drop an earlier role's entry_id from the chain.
+    prior_entry_ids: list = []
+    if handoff:
+        try:
+            prior_entry_ids = json.loads(handoff).get("written_entry_ids", [])
+        except json.JSONDecodeError:
+            prior_entry_ids = []
+    new_entry_ids = [
+        event["result"]["entry_id"]
+        for event in tool_events
+        if event.get("tool") == "write_entry"
+        and isinstance(event.get("result"), dict)
+        and "entry_id" in event["result"]
+    ]
+    written_entry_ids = prior_entry_ids + [e for e in new_entry_ids if e not in prior_entry_ids]
+
     # Scoped handoff: allow-list only what the next subagent needs. The raw
     # `messages` session history (and anything injected into this role's
     # system prompt, e.g. a planted canary) is never copied forward — it
@@ -536,6 +558,7 @@ def run_role(
         "summary": output_document.get("summary", ""),
         "decisions": output_document.get("decisions", []),
         "citation_list": output_document.get("citation_list", []),
+        "written_entry_ids": written_entry_ids,
         "output_document": output_document,
     }
     next_handoff = json.dumps(scoped_handoff, indent=2)
