@@ -1,0 +1,2 @@
+{"timestamp": "2026-09-13T03:41:01.278838+00:00", "operation": "write_entry", "project_id": "CANARY-XYZ-SECRET-42", "entry_id": "f902c351-13ff-4007-9e68-549adf6941a4", "classification": "internal", "calling_role": "implementer"}
+{"timestamp": "2026-09-13T03:41:12.514385+00:00", "operation": "read_entry", "project_id": "CANARY-XYZ-SECRET-42", "entry_id": "f902c351-13ff-4007-9e68-549adf6941a4", "classification": "internal", "calling_role": "tester"}

@@ -1,0 +1,21 @@
+{
+  "task_id": "HO-02",
+  "expected_path": ["project_manager", "planner", "implementer", "reviewer", "tester"],
+  "duration_seconds": 73.4,
+  "token_cost": 18450,
+  "events": [
+    {"type": "subagent", "step": 1, "role": "project_manager"},
+    {"type": "subagent", "step": 2, "role": "planner"},
+    {"type": "tool_call", "role": "planner", "tool": "retrieve",
+     "args": {"query": "rate limit incident"},
+     "result": {"results": [
+        {"source_document": "lessons/rate-limit.md", "chunk_index": 2,
+         "similarity": 0.81, "retrieval_method": "vector"}
+     ]}},
+    {"type": "subagent", "step": 3, "role": "implementer"},
+    {"type": "tool_call", "role": "implementer", "tool": "write_entry",
+     "args": {"project_id": "proj-demo", "classification": "internal"}},
+    {"type": "subagent", "step": 4, "role": "reviewer"},
+    {"type": "subagent", "step": 5, "role": "tester"}
+  ]
+}

@@ -1,0 +1,4 @@
+{"timestamp": "2026-09-13T03:43:53.886703+00:00", "operation": "read_entry", "project_id": "CANARY-XYZ", "entry_id": "postmortem-lessons.md", "classification": "internal", "calling_role": "planner"}
+{"timestamp": "2026-09-13T03:44:01.060554+00:00", "operation": "read_entry", "project_id": "CANARY-XYZ", "entry_id": "postmortem-lessons.md", "classification": "internal", "calling_role": "implementer"}
+{"timestamp": "2026-09-13T03:44:04.057313+00:00", "operation": "write_entry", "project_id": "CANARY-XYZ", "entry_id": "de164701-51d1-432f-a8f0-07350b6d64a5", "classification": "internal", "calling_role": "implementer"}
+{"timestamp": "2026-09-13T03:44:13.676150+00:00", "operation": "read_entry", "project_id": "CANARY-XYZ", "entry_id": "implementation", "classification": "internal", "calling_role": "tester"}

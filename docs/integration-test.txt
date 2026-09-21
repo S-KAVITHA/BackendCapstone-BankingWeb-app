@@ -1,0 +1,121 @@
+---
+  You are running a full end-to-end test of two MCP servers: `storage` (port
+  8001) and `retrieval` (port 8002). Execute each step in order, report the
+  result of each tool call, and flag any failures immediately.
+
+  ---
+
+  ## STORAGE SERVER TESTS
+
+  **Step 1 — write_entry (create)**
+  Write a new entry:
+  - project_id: "test-e2e"
+  - entry_type: "note"
+  - title: "E2E Test Entry"
+  - content: "This is an automated end-to-end test entry created to verify
+  write_entry works correctly."
+  - classification: "public"
+  - calling_role: "tester"
+
+  Save the returned entry_id for subsequent steps.
+
+  **Step 2 — list_entries (verify it appears)**
+  Call list_entries with project_id "test-e2e". Confirm the entry from Step 1
+  appears in the results.
+
+  **Step 3 — read_entry (read it back)**
+  Call read_entry with project_id "test-e2e" and the entry_id from Step 1.
+  Confirm the title and content match what was written.
+
+  **Step 4 — update_entry (modify content)**
+  Call update_entry with project_id "test-e2e", the entry_id from Step 1, new
+  content "Updated content: end-to-end test update confirmed.", calling_role
+  "tester". Confirm success.
+
+  **Step 5 — read_entry (verify update)**
+  Read the entry again and confirm the content now reflects the updated text.
+
+  **Step 6 — delete_entry (soft delete)**
+  Call delete_entry with project_id "test-e2e" and the entry_id from Step 1.
+  Confirm success.
+
+  **Step 7 — read_entry (verify deletion)**
+  Attempt to read the deleted entry. Confirm it returns an error (not found),
+  proving the soft-delete works.
+
+  **Step 8 — validation rejection test**
+  Attempt to write an entry with classification "confidential". Confirm the
+  server rejects it with an error.
+
+  ---
+
+  ## RETRIEVAL SERVER TESTS
+
+  **Step 9 — vector retrieval**
+  Call retrieve with:
+  - query: "How does the CSV export feature work?"
+  - project_id: "proj-csv"
+  - top_k: 3
+  - classification_ceiling: "internal"
+
+  Confirm at least one result is returned with a similarity_score and
+  retrieval_method of "vector". Report the source_document and excerpt of the
+  top result.
+
+  **Step 10 — keyword fallback test**
+  Call retrieve with a very specific rare query unlikely to match any vector
+  well, such as:
+  - query: "EXPORT_LIMIT_EXCEEDED error code meaning"
+  - project_id: "proj-csv"
+  - top_k: 3
+  - classification_ceiling: "internal"
+
+  Report whether results came back via "vector" or "keyword" retrieval_method.
+
+  **Step 11 — classification ceiling enforcement**
+  Call retrieve with:
+  - query: "security visibility rules"
+  - project_id: "proj-csv"
+  - top_k: 3
+  - classification_ceiling: "public"
+
+  Then repeat the same query with classification_ceiling: "internal". Compare
+  the number of results — the internal ceiling should return equal or more
+  results than the public ceiling.
+
+  **Step 12 — metadata filter test**
+  Call retrieve with:
+  - query: "CSV format decision"
+  - project_id: "proj-csv"
+  - top_k: 3
+  - classification_ceiling: "internal"
+  - metadata_filters: {"doc_type": "decision"}
+
+  Confirm all returned results have doc_type "decision" in their source_document
+   name.
+
+  ---
+
+  ## SUMMARY
+  After completing all steps, provide a pass/fail summary table:
+
+  | Step | Description | Result |
+  |------|-------------|--------|
+  | 1    | write_entry | |
+  | 2    | list_entries | |
+  | 3    | read_entry | |
+  | 4    | update_entry | |
+  | 5    | read after update | |
+  | 6    | delete_entry | |
+  | 7    | read after delete | |
+  | 8    | classification rejection | |
+  | 9    | vector retrieval | |
+  | 10   | keyword fallback | |
+  | 11   | ceiling enforcement | |
+  | 12   | metadata filter | |
+
+  ---
+  This covers every tool on the storage server (write/read/list/update/delete +
+  validation), and the key retrieval behaviors (vector search, keyword fallback,
+   classification ceiling, metadata filtering) using the actual proj-csv project
+   and internal ceiling from your reference docs.

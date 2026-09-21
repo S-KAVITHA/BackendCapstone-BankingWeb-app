@@ -1,0 +1,2 @@
+{"timestamp": "2026-09-13T04:46:12.808706+00:00", "operation": "read_entry", "project_id": "demo-project", "entry_id": "incident-report-2024-q3.md", "classification": "internal", "calling_role": "planner"}
+{"timestamp": "2026-09-13T04:46:12.808752+00:00", "operation": "read_entry", "project_id": "demo-project", "entry_id": "postmortem-lessons.md", "classification": "internal", "calling_role": "planner"}

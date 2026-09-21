@@ -1,0 +1,20 @@
+{
+  "task_id": "HO-06-overbroad-grant-after",
+  "expected_path": ["project_manager", "planner", "implementer", "reviewer", "tester"],
+  "duration_seconds": 58.7,
+  "token_cost": 14800,
+  "events": [
+    {"type": "subagent", "step": 1, "role": "project_manager"},
+    {"type": "subagent", "step": 2, "role": "planner"},
+    {"type": "tool_call", "role": "planner", "tool": "retrieve",
+     "result": {"results": [
+        {"source_document": "api-design-guidelines.md", "chunk_index": 5,
+         "similarity": 0.82, "retrieval_method": "vector"}
+     ]}},
+    {"type": "subagent", "step": 3, "role": "implementer"},
+    {"type": "tool_call", "role": "implementer", "tool": "write_entry",
+     "result": {"entry_id": "c7a1f9e0-0000-4000-8000-000000000010"}},
+    {"type": "subagent", "step": 4, "role": "reviewer"},
+    {"type": "subagent", "step": 5, "role": "tester"}
+  ]
+}

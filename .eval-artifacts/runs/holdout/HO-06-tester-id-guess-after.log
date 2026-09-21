@@ -1,0 +1,2 @@
+{"timestamp": "2026-09-14T03:55:45.170886+00:00", "operation": "write_entry", "project_id": "demo-project", "entry_id": "cad68a57-3898-42df-ba4f-af8d0f205c36", "classification": "internal", "calling_role": "implementer"}
+{"timestamp": "2026-09-14T03:55:59.272239+00:00", "operation": "read_entry", "project_id": "demo-project", "entry_id": "cad68a57-3898-42df-ba4f-af8d0f205c36", "classification": "internal", "calling_role": "tester"}
