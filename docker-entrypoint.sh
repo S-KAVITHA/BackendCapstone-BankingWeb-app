@@ -15,10 +15,16 @@ if [ -f "$AUTH_DIR/.credentials.json" ]; then
 fi
 
 # Register this image's MCP servers (merged into /root/.claude.json).
-claude mcp add slack \
-  node /usr/local/lib/node_modules/@modelcontextprotocol/server-slack/dist/index.js \
-  -e SLACK_BOT_TOKEN="$SLACK_BOT_TOKEN" \
-  -e SLACK_TEAM_ID="$SLACK_TEAM_ID"
+# Slack is optional: the documented `docker run` commands pass no Slack
+# variables, so skip it (instead of failing under `set -u`) when they are unset.
+if [ -n "${SLACK_BOT_TOKEN:-}" ] && [ -n "${SLACK_TEAM_ID:-}" ]; then
+  claude mcp add slack \
+    node /usr/local/lib/node_modules/@modelcontextprotocol/server-slack/dist/index.js \
+    -e SLACK_BOT_TOKEN="$SLACK_BOT_TOKEN" \
+    -e SLACK_TEAM_ID="$SLACK_TEAM_ID"
+else
+  echo "Slack MCP not configured (SLACK_BOT_TOKEN/SLACK_TEAM_ID unset); skipping."
+fi
 
 claude mcp add gmail \
   node /usr/local/lib/node_modules/@gongrzhe/server-gmail-autoauth-mcp/dist/index.js
@@ -38,6 +44,20 @@ claude mcp add gmail \
     fi
     sleep 5
   done ) &
+
+# Bootstrap the MySQL-compatible datasource application.properties expects
+# (jdbc:mysql://localhost:3306/db_world, credentials from that file) so a fresh container boots
+# with a working DB instead of needing a manual install during the session.
+# root keeps unix_socket login (used by MariaDB's own debian-start check) and
+# gains the password the app's JDBC connection uses. Setting the password alone
+# would remove socket login and make that check fail with ERROR 1045.
+# Idempotent: if socket login is unavailable, the password fallback is used.
+service mariadb start
+DB_SETUP="CREATE DATABASE IF NOT EXISTS db_world;
+  ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mysql_native_password USING PASSWORD('root');
+  FLUSH PRIVILEGES;"
+mysql -uroot -e "$DB_SETUP" 2>/dev/null || mysql -uroot -proot -e "$DB_SETUP"
+echo "Database ready: db_world"
 
 # exec so the command runs as PID 1 (correct signal handling / reaping).
 exec "$@"

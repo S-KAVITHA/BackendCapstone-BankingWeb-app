@@ -1,0 +1,1 @@
+BankingProject_Backend: a Spring Boot/Java/MySQL online banking backend with customer services (accounts, transactions, fund transfers, cheque requests) and admin approval workflows.

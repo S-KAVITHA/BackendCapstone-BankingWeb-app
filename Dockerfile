@@ -7,6 +7,11 @@ WORKDIR /workspace
 # curl: network boundary verification
 # git: review/rollback of agent changes
 # Node.js/npm + Claude Code: agentic engineering workflow
+# MariaDB (MySQL-wire-compatible): database server for the
+# application.properties datasource (localhost:3306/db_world);
+# docker-entrypoint.sh creates the database and login at start.
+# Java 8 JDK comes from the base image; Maven dependencies (incl. the
+# MySQL JDBC driver) are pre-fetched by `mvn dependency:go-offline` below.
 
 
 
@@ -17,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     maven \
     nodejs \
     npm \
+    mariadb-server \
     && rm -rf /var/lib/apt/lists/*
 
 COPY pom.xml .
