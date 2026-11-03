@@ -52,230 +52,98 @@ This repository supports running **two Claude Code agents in parallel** on the s
 
 ### 1. Worktree Setup
 
-Run these commands on the **host**, from the root of the main repository. Create one worktree and one branch per agent, branching from an up-to-date `main`:
+From the main repository root, create a worktree and branch for each agent:
 
 ```bash
-git checkout main
-git pull                                    # if a remote is configured
-
 git worktree add ../target-agent-a -b feature/agent-a
 git worktree add ../target-agent-b -b feature/agent-b
 ```
 
-This creates sibling directories next to the main repository:
+Directories created:
 
-| Directory | Branch | Used by |
-|---|---|---|
-| `../target-agent-a` | `feature/agent-a` | Agent A |
-| `../target-agent-b` | `feature/agent-b` | Agent B |
-
-Each worktree is a full checkout of the project. All of them share the main repository's `.git` object store, so you don't need to re-clone. A branch can be checked out in only one worktree at a time, which stops both agents from writing to the same branch.
-
-> **Note: worktree `.git` files point to a host path.** Inside a worktree, `.git` is a *file* (for example `gitdir: /path/to/main-repo/.git/worktrees/target-agent-b`), not a directory. When you mount only the worktree into a container, that host path doesn't exist there, and `git` commands inside the container fail with `fatal: not a git repository`. Run all git commands (status, diff, commit, merge) **on the host**. The agents edit files, run builds, and run tests inside the container.
+- `../target-agent-a` (`feature/agent-a`)
+- `../target-agent-b` (`feature/agent-b`)
 
 ### 2. Agent Responsibilities
 
-Work is split along the application's architectural layers so the two agents never write to the same files:
+Work is split by architectural layer:
 
-| Agent | Branch / Worktree | Write scope | Read-only scope |
-|---|---|---|---|
-| **Agent A** | `feature/agent-a` / `../target-agent-a` | REST controllers and service-layer logic:<br>`src/main/java/com/example/demo/controller/`<br>`src/main/java/com/example/demo/service/` | `model/`, `repository/`, `pom.xml`, `src/main/resources/` |
-| **Agent B** | `feature/agent-b` / `../target-agent-b` | JPA entities, repositories, and unit/integration tests:<br>`src/main/java/com/example/demo/model/`<br>`src/main/java/com/example/demo/repository/`<br>`src/test/java/com/example/demo/` | `controller/`, `service/`, `pom.xml`, `src/main/resources/` |
-
-Shared files such as `pom.xml`, `application.properties`, `Dockerfile`, and `README.md` are **read-only for both agents**. If either agent needs one of them changed, a human makes the change on `main`, and then each worktree picks it up (see [Syncing with `main`](#syncing-a-worktree-with-main)).
-
-Both agents must follow the project decisions recorded in `.memory/project/`:
-
-- Code must stay **Java 8 compatible** (`java.version` is `1.8` in `pom.xml`).
-- Tests stay under `src/test/java` and follow the existing package structure.
-- Use SLF4J logging, not `System.out.println`.
-- Handle exceptions centrally through `@ControllerAdvice`.
-
-#### Session task definition
-
-Fill in a session block in `session_tasks.md` for each agent **before** you start it, and paste that block into the agent's first prompt. Every session must specify:
-
-- **Branch name** and **Worktree directory**
-- **Task / Objective**: a clear description of what the agent should do
-- **Write scope**: the files and folders the agent may modify
-- **Read scope**: the files and folders the agent may read but not modify
-- **Allowed commands**: for example `./mvnw compile`, `./mvnw test`
-- **Definition of done**: concrete success criteria, for example "all tests pass and the new endpoint returns 200"
-- An explicit instruction: *"Do not modify any file outside your write scope. If a change outside your scope is required, stop and report it."*
+| Agent | Branch | Designated Scope |
+|---|---|---|
+| Agent A | `feature/agent-a` | REST Controllers & Service-layer logic |
+| Agent B | `feature/agent-b` | JPA Repositories, Entities, and Unit/Integration Tests |
 
 ### 3. Container Execution
 
-Build the image once from the main repository root:
+Build the Docker image and run each worktree in its own container:
 
 ```bash
+# Build base image
 docker build -t backend-banking-capstone-app .
-```
 
-The image is based on `eclipse-temurin:8-jdk` and includes Maven, git, Node.js, and Claude Code. During the build it pre-fetches the Maven dependencies from `pom.xml`.
-
-Start one container per worktree, each in its own terminal. Name the containers so you can tell them apart:
-
-```bash
-# Terminal 1 — Agent A
-cd ../target-agent-a
+# Inside /path/to/target-agent-a
 docker run -it --rm \
-  --name agent-a \
-  -e SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN:-}" \
-  -e SLACK_TEAM_ID="${SLACK_TEAM_ID:-}" \
-  -v "$PWD:/workspace" \
-  -v claude-auth:/claude-auth \
+  -v "${PWD}:/workspace" \
+  -v "claude-auth:/claude-auth" \
   backend-banking-capstone-app
 
-# Terminal 2 — Agent B
-cd ../target-agent-b
+# Inside /path/to/target-agent-b
 docker run -it --rm \
-  --name agent-b \
-  -e SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN:-}" \
-  -e SLACK_TEAM_ID="${SLACK_TEAM_ID:-}" \
-  -v "$PWD:/workspace" \
-  -v claude-auth:/claude-auth \
+  -v "${PWD}:/workspace" \
+  -v "claude-auth:/claude-auth" \
   backend-banking-capstone-app
 ```
 
-Windows (PowerShell):
+Both containers share the `claude-auth` volume for authentication.
 
-```powershell
-cd ..\target-agent-a
-docker run -it --rm `
-  --name agent-a `
-  -e SLACK_BOT_TOKEN="$env:SLACK_BOT_TOKEN" `
-  -e SLACK_TEAM_ID="$env:SLACK_TEAM_ID" `
-  -v "${PWD}:/workspace" `
-  -v claude-auth:/claude-auth `
-  backend-banking-capstone-app
-```
+### 4. Verification
 
-What each piece does:
+Verify setup before running agent sessions:
 
-| Option | Purpose |
-|---|---|
-| `-v "$PWD:/workspace"` | Mounts **only this worktree** into the container, so the agent can't see or edit the other agent's checkout. |
-| `-v claude-auth:/claude-auth` | Shared named volume. `docker-entrypoint.sh` restores the saved Claude credential from it and saves any refreshed credential back. You log in once and both containers reuse that login. |
-| `-e SLACK_BOT_TOKEN` / `-e SLACK_TEAM_ID` | The entrypoint runs with `set -u` and reads these variables when it registers the Slack MCP server. They must be **defined**, even as empty strings, or the container exits on startup. |
-| `--rm` | Removes the container on exit. Your code changes persist because they live in the mounted worktree. |
+- Worktrees (main repo): `git worktree list`
+- Branches (inside each worktree): `git branch`
+- Mounts (inside each container): `ls /workspace`
 
-Inside each container, start Claude Code and paste that agent's session task block:
+### 5. Session Guardrails
 
-```bash
-claude
-```
+Every agent prompt must specify:
 
-The agent can build and test its own worktree in isolation:
+- **Objective**: Clear description of the task.
+- **Write Scope**: Allowed files/folders.
+- **Read Scope**: Reference files/folders (read-only).
+- **Allowed Commands**: Build/test permissions.
+- **Definition of Done**: Success criteria.
+- Explicit instruction not to modify files outside assigned paths.
+
+### 6. Review, Commit, and Merge
+
+Review each worktree independently against `main`:
 
 ```bash
-./mvnw -q compile
-./mvnw test
-```
-
-If both agents need to run the Spring Boot app at the same time, publish its port (`8085`) to a **different host port** for each container, for example `-p 8085:8085` for Agent A and `-p 8086:8085` for Agent B.
-
-#### Verifying the setup
-
-Before you start the agent sessions, confirm the isolation is correct:
-
-| Check | Where | Command | Expected |
-|---|---|---|---|
-| Worktrees exist | Host, main repo | `git worktree list` | Three entries: main, `target-agent-a`, `target-agent-b` |
-| Correct branch | Host, in each worktree | `git branch --show-current` | `feature/agent-a` or `feature/agent-b` |
-| Correct mount | Inside each container | `ls /workspace` | That worktree's files only |
-| Running containers | Host | `docker ps --filter name=agent-` | `agent-a` and `agent-b` |
-
-To open a second shell in a running agent container, run `docker exec -it agent-a /bin/bash`.
-
-### 4. Review, Commit, and Merge Workflow
-
-When both agents report that their definition of done is met, exit the containers and do the rest **on the host**.
-
-#### Step 1: Review each worktree independently
-
-```bash
-cd ../target-agent-a
 git status
-git diff main --stat          # confirm only files inside Agent A's write scope changed
-git diff main                 # read the full change
+git diff main
 ```
 
-Repeat in `../target-agent-b`. Reject or revert any change outside the agent's write scope:
+Commit accepted changes:
 
 ```bash
-git restore path/to/out-of-scope-file
+git add .
+git commit -m "feat: complete agent task"
 ```
 
-You can also ask the `code-reviewer` agent to review the diff before you commit.
-
-#### Step 2: Verify the build and tests in each worktree
+Merge and clean up from the main repository:
 
 ```bash
-./mvnw test
-```
-
-#### Step 3: Commit on each feature branch
-
-Stage specific paths rather than `git add .`, so stray files don't get committed:
-
-```bash
-# in ../target-agent-a
-git add src/main/java/com/example/demo/controller src/main/java/com/example/demo/service
-git commit -m "feat(agent-a): <summary of controller/service change>"
-
-# in ../target-agent-b
-git add src/main/java/com/example/demo/model src/main/java/com/example/demo/repository src/test/java
-git commit -m "feat(agent-b): <summary of entity/repository/test change>"
-```
-
-#### Step 4: Merge into `main`
-
-Go back to the main repository and merge in dependency order. Merge Agent B first, because the persistence layer and its tests are what Agent A's services build on:
-
-```bash
-cd /path/to/main-repo
 git checkout main
+git merge feature/agent-a
+git merge feature/agent-b
 
-git merge --no-ff feature/agent-b -m "Merge feature/agent-b: entities, repositories, tests"
-./mvnw test                   # verify main after the first merge
-
-git merge --no-ff feature/agent-a -m "Merge feature/agent-a: controllers, services"
-./mvnw test                   # verify the integrated result
-```
-
-The write scopes don't overlap, so these merges should be conflict-free. If you do hit a conflict, it usually means an agent wrote outside its scope. Resolve it manually, then run `git add <file>` and `git commit`. Run `./mvnw test` again before you continue.
-
-#### Step 5: Clean up
-
-```bash
+# Remove worktrees and branches
 git worktree remove ../target-agent-a
 git worktree remove ../target-agent-b
 git branch -d feature/agent-a
 git branch -d feature/agent-b
-git worktree prune             # clears metadata for any worktree deleted by hand
 ```
-
-`git branch -d` refuses to delete a branch that hasn't been merged, which is a useful safety check. Use `-D` only when you intend to discard an agent's work.
-
-### Syncing a worktree with `main`
-
-If `main` changes while the agents are still working (for example, after a human updates `pom.xml`), bring the change into a worktree before you continue:
-
-```bash
-cd ../target-agent-a
-git merge main                 # or: git rebase main (only if the branch is not shared)
-```
-
-### Troubleshooting
-
-| Symptom | Cause | Fix |
-|---|---|---|
-| `fatal: not a git repository` inside the container | The worktree's `.git` file points to a host path that isn't mounted | Run git commands on the host |
-| `fatal: 'feature/agent-a' is already checked out` | The branch is already in use by another worktree | Use a different branch name, or remove the old worktree |
-| Container exits immediately with `SLACK_BOT_TOKEN: unbound variable` | The entrypoint uses `set -u` | Pass `-e SLACK_BOT_TOKEN="" -e SLACK_TEAM_ID=""` |
-| Claude asks you to log in again | The `claude-auth` volume wasn't mounted | Add `-v claude-auth:/claude-auth` |
-| `port is already allocated` | Both containers publish the same host port | Map each container to a different host port |
-
 # Module 2 — LaunchCode Agentic Engineer
 
 Docker development environment for LaunchCode's **Agentic Programming** course, Module 2. Extends the Module 1 environment with:
