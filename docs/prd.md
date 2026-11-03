@@ -7,12 +7,12 @@ This workflow uses a single agent inside a Docker container to run project valid
 The workflow starts when a developer requests Maven test validation for the project.
 
 ## Workflow Selection Justification
-Maven test execution was selected over broader code analysis tasks because it is deterministic, repeatable, and produces measurable pass/fail results within the container environment.
+Maven test validation was chosen over the alternative of asking the agent to review the controller code for defects. A code review produces open-ended findings that depend on the reviewer, and two runs can disagree. `mvn test` produces the same objective outputs every run (an exit status and counts of passed, failed, errored and skipped tests), so a run can be checked against the Maven output and repeated with identical results.
 
 ## Decision Events
 - If the build succeeds, record the successful build result.
 - If tests fail, record the failing tests and required fixes.
-- If the container environment prevents execution, document the blocking issue.
+- If the container environment prevents execution (for example, Maven, Java or the database is unavailable), the run is classified as **Blocked**, not Pass or Fail. The agent records the blocking error and does not attempt fixes or installs.
 
 ## Ordered Actions
 1. Start the containerized development environment.
@@ -26,6 +26,7 @@ Maven test execution was selected over broader code analysis tasks because it is
 - The command output is captured and reviewed.
 - The result can be classified as pass or fail using objective evidence.
 - The workflow does not modify unrelated project files.
+- Allowed file changes: only Maven build output under `target/` (compiled classes and `surefire-reports`), which is generated and git-ignored. Any change to tracked files (source, tests, `pom.xml`, configuration, docs) fails Scope Compliance. `git status` before and after the run shows the working tree is unchanged.
 
 ---
 
