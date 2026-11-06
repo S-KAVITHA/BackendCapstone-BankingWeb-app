@@ -18,7 +18,7 @@ To address these gaps, Run 002 added one prompt change: "Do not modify any files
 - **Result Accuracy 3 → 3:** both reports matched the Maven output. Run 002 was more complete (it added errored and skipped counts in a structured list), but level 3 already covers "correctly reports exit status and test counts", and level 4 requires explaining findings, which neither run did.
 - **Scope Compliance 3 → 3:** Run 002 added an explicit no-modification instruction, but neither run verified the working tree with `git status`, which level 4 requires.
 
-**Rubric limitation:** The rubric doesn't distinguish a complete, structured metric report from a minimal correct one, so Run 002's improvement in reporting quality isn't reflected in its scores. A future revision could add a "Reporting Completeness" dimension, or require all five metrics (total, passed, failed, errored, skipped) for Result Accuracy 3.
+**Rubric limitation:** The rubric doesn't distinguish a complete, structured metric report from a minimal correct one, so Run 002's improvement in reporting quality isn't reflected in its scores. A future revision could add a "Reporting Completeness" dimension, or require all five metrics (total, passed, failed, errored, skipped) for Result Accuracy 3. **Addressed in rubric v2:** level 3 now requires all five counts for Maven tests, and the goal, exit status, categories and report location for Checkstyle.
 
 ### Workflow Stability
 Run 002 successfully verified the test suite with structured and comprehensive metrics. The agent followed the no-modification instruction (not verified with `git status`) and confirmed that all tests passed successfully, keeping the workflow stable and reliable.
@@ -27,7 +27,104 @@ Run 002 successfully verified the test suite with structured and comprehensive m
 | Run ID  | Date       | Task                        | Agent/Tool | Prompt/Command                                                                                                                                                                                                                                         | Cycle Time | Rubric Scores                                                                                                                                                       | Pass/Fail | Review Latency |  Cost | Observations                                                                                                                        |
 |---------|------------|-----------------------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------------:|------:|-------------------------------------------------------------------------------------------------------------------------------------|
 | Run 003 | 2026-08-17 | Run Maven test suite        | Claude     | `time claude "Run the Maven test suite for this project. Do not modify any files. Report the Maven exit status, total tests, passed tests, failed tests, and skipped tests."`                                                                          |        53s | Task Completion: 3 (completed requested validation; no extra analysis); Result Accuracy: 3 (reported results matched Maven output); Scope Compliance: 3 (no unrelated project changes observed; working tree not verified with `git status`) | Pass      |            ~2m | $0.29 | Maven test command completed successfully with exit status 0 (BUILD SUCCESS) and correctly ran all 46 tests across controllers and services, resulting in 0 failures, 0 errors, and 0 skipped tests. |
-| Run 004 | 2026-08-17 | Run Maven Checkstyle plugin | Claude     | `time claude "Run the Checkstyle plugin using Maven (e.g., mvnw checkstyle:check or checkstyle:checkstyle) and summarize the lint results, reporting the total violations, categories, and any errors or warnings found. Write the results to docs/lint-report.md. Do not fix any errors or modify any source files."` |     2m 09s | Task Completion: 4 (completed requested validation); Result Accuracy: 4 (reported results matched Maven output); Scope Compliance: 4 (no unrelated project changes) | Pass      |            ~2m | $0.35 | Checkstyle ran successfully using the default Sun checks ruleset, finding 982 total violations, primarily missing Javadocs and model class styling. The full summary was saved to docs/lint-report.md.|
+| Run 004 | 2026-08-17 | Run Maven Checkstyle plugin | Claude     | `time claude "Run the Checkstyle plugin using Maven (e.g., mvnw checkstyle:check or checkstyle:checkstyle) and summarize the lint results, reporting the total violations, categories, and any errors or warnings found. Write the results to docs/lint-report.md. Do not fix any errors or modify any source files."` |     2m 09s | Task Completion: 4 (beyond the counts, explained that "error" severity does not break this build and recommended a better-suited ruleset); Result Accuracy: 4 (982 total with per-category counts and descriptions, plus explanation of the main findings); Scope Compliance: 3 (no unrelated changes observed; working tree not verified with `git status`) | Pass      |            ~2m | $0.35 | Checkstyle ran successfully using the default Sun checks ruleset, finding 982 total violations, primarily missing Javadocs and model class styling. The full summary was saved to docs/lint-report.md.|
+
+### Run 004 Notes
+
+- **Goal executed:** `./mvnw org.apache.maven.plugins:maven-checkstyle-plugin:3.3.1:checkstyle -Dcheckstyle.config.location=sun_checks.xml` (report goal with full plugin coordinates, because `pom.xml` has no Checkstyle plugin).
+- **Exit status:** not recorded during the run. The report goal does not fail the build on violations.
+- **Observation:** the prompt offered two goals ("`checkstyle:check` or `checkstyle:checkstyle`"), so the agent chose the goal and the Sun ruleset itself, and two operators could run different checks. **Next operator:** name the exact goal and ruleset in the prompt, and require the exit status in the report.
+
+## Workflow 2 — Commit-to-Merge Narrative
+
+| Agent | Run output | Branch commit | Merged by | Merge changed |
+|---|---|---|---|---|
+| B (Checkstyle, Run 004) | `docs/lint-report.md` | `4a8a805` on `feature/agent-b` | `1f51fe6` | `docs/lint-report.md` only |
+| A (`mvn test`) | `docs/test-report.md` (exit 0; 49 passed, 0 failed/errored/skipped) | `f9871a5` on `feature/agent-a` | `bdffe40` | `docs/test-report.md` only |
+
+- **Agent A evidence:** Run 003 changed no files, so it left no branch commit. It was repeated on 2026-11-05, writing its results to `docs/test-report.md`, which was committed on `feature/agent-a` and merged. `git status` on the host showed it was the only new file.
+- **Older `feature/agent-a` commit:** `a081734` is from the Module 1 exercise; the branch names were reused. `fb8ce11` in the Agent A merge is an identical copy of `bc637f9` (no content change).
+- **Why the merges were clean:** each branch added one new file that nothing else touched. No file was edited on both sides of either merge.
+
+Agent A commit and merge (shortened; an earlier identical commit was undone with `git reset --soft` and recommitted):
+
+```text
+target-agent-a$ git status
+On branch feature/agent-a
+Changes to be committed:
+        new file:   docs/test-report.md
+target-agent-a$ git commit -m "docs: review comments fix : add test-report.md from Agent A mvn test run"
+[feature/agent-a f9871a5] docs: review comments fix : add test-report.md from Agent A mvn test run
+ 1 file changed, 20 insertions(+)
+ create mode 100644 docs/test-report.md
+BackendCapstone-BankingWeb-app$ git branch --show-current
+main
+BackendCapstone-BankingWeb-app$ git merge --no-ff feature/agent-a -m "Merge branch 'feature/agent-a': Agent A test report"
+Merge made by the 'ort' strategy.
+ docs/test-report.md | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+```
+
+Branch-to-merge history (`git log --oneline --graph`):
+
+```text
+# Agent B
+*   1f51fe6 Merge branch 'feature/agent-b'
+|\
+| * 4a8a805 docs: add lint-report.md in target-agent-b
+* | 57d4fba docs: update iteration-log with second workflow run
+
+# Agent A
+*   bdffe40 Merge branch 'feature/agent-a': Agent A test report
+|\
+| * f9871a5 docs: review comments fix : add test-report.md from Agent A mvn test run
+| * fb8ce11 docs: review comments fixed sharpen PRD scope and justify rubric scores with notes
+* | bc637f9 docs: review comments fixed sharpen PRD scope and justify rubric scores with notes
+|/
+```
+
+## Workflow 2 — Container Isolation Verification
+
+Captured on 2026-11-05 with both agent containers running at the same time, using the same worktree layout and `docker run` command as the workflow (`-v "${PWD}:/workspace"` from each worktree). At the time of this check, `target-agent-a` was on `feature/agent-a` (`f9871a5`) and `target-agent-b` on `feature/agent-b` (`7332b74`).
+
+**Mount inspection (host):**
+
+```text
+$ docker inspect agent-a --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{println}}{{end}}'
+/mnt/c/Users/User/downloads/AgenticEngineer/target-agent-a -> /workspace
+/var/lib/docker/volumes/claude-auth/_data -> /claude-auth
+
+$ docker inspect agent-b --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{println}}{{end}}'
+/mnt/c/Users/User/downloads/AgenticEngineer/target-agent-b -> /workspace
+/var/lib/docker/volumes/claude-auth/_data -> /claude-auth
+```
+
+**File visibility (inside each container):**
+
+```text
+# Agent A container
+ai-course:/workspace# ls /workspace/docs
+bug-report.md         memory-architecture.md           routing-and-tool-grant-map.md
+calibration-log.md    orchestration-diagram.md         rubric.md
+holdout-task-set.md   prd.md                           test-report.md
+integration-test.txt  retrieval-ground-truth.md        transcripts
+iteration-log.md      retrieval-quality-report.md
+lint-report.md        routing-and-tool-grant-map.json
+ai-course:/workspace# ls /mnt/c/Users/User/downloads/AgenticEngineer/target-agent-b
+ls: cannot access '/mnt/c/Users/User/downloads/AgenticEngineer/target-agent-b': No such file or directory
+
+# Agent B container
+ai-course:/workspace# ls /workspace/docs
+bug-report.md         lint-report.md             retrieval-quality-report.md
+calibration-log.md    memory-architecture.md     routing-and-tool-grant-map.json
+holdout-task-set.md   orchestration-diagram.md   routing-and-tool-grant-map.md
+integration-test.txt  prd.md                     rubric.md
+iteration-log.md      retrieval-ground-truth.md  transcripts
+ai-course:/workspace# ls /mnt/c/Users/User/downloads/AgenticEngineer/target-agent-a
+ls: cannot access '/mnt/c/Users/User/downloads/AgenticEngineer/target-agent-a': No such file or directory
+```
+
+**Result:** each container mounts only its own worktree at `/workspace` (plus the shared `claude-auth` login volume). Neither can reach the other's worktree, and Agent A's `test-report.md` is not visible to Agent B. Inside the containers, `/proc/mounts` shows only `path=C:\` for the WSL drive, so the host-side `docker inspect` is what identifies each mount's source folder.
 
 Output of git log --oneline:
 

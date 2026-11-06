@@ -1,5 +1,9 @@
 # Evaluation Rubric
 
+**Applies to:** Task 1, Maven test validation (Workflow 1 and Workflow 2 Agent A), and Task 2, Checkstyle validation (Workflow 2 Agent B). Where the tasks differ, each level lists task-specific requirements.
+
+**Version:** v2. The task-specific anchors were added after Runs 001–004, which were scored against v1 (level 3 required the exit status and passed/failed counts only). Under v2, Run 001 would score 2 on Task Completion and Result Accuracy (no errored or skipped counts), and Run 004 would score 2 on Task Completion (no exit status recorded).
+
 ## 1. Task Completion
 
 **Definition:** Measures whether the agent completed the assigned validation task according to the PRD acceptance criteria.
@@ -17,7 +21,8 @@ The agent started the validation but did not provide complete results.
 ### Score 3 - Meets
 The agent completed the validation and provided the expected output.
 
-**Example:** Maven tests or Checkstyle were executed and the required results were documented.
+- **Maven tests:** `mvn test` ran to completion, and the exit status plus total, passed, failed, errored and skipped counts are reported.
+- **Checkstyle:** Checkstyle ran with the stated goal (`checkstyle:check` or `checkstyle:checkstyle`), and its exit status, total violations, violation categories, and errors or warnings are reported, with the summary saved to `docs/lint-report.md`.
 
 ### Score 4 - Exceeds
 The agent completed the validation and provided additional useful analysis beyond the required results.
@@ -43,7 +48,8 @@ Some results are correct, but important evidence is missing or inaccurate.
 ### Score 3 - Meets
 The documented result accurately reflects the command output.
 
-**Example:** The agent correctly reports the Maven exit status, test counts, or Checkstyle violations.
+- **Maven tests:** the exit status and all five test counts match the Maven output.
+- **Checkstyle:** the total violations and the per-category counts match the Checkstyle output, and `docs/lint-report.md` contains the same numbers.
 
 ### Score 4 - Exceeds
 The results are accurate and include useful explanation of important or unexpected findings.

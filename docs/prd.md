@@ -1,5 +1,7 @@
 # Product Requirements Document
 
+**Covers two tasks:** Workflow 1 (single-agent Maven test validation) and Workflow 2 (multi-agent: Agent A runs Maven tests, Agent B runs Checkstyle). Each workflow section lists its own trigger, actions, decision events and acceptance criteria.
+
 ## Workflow 1 — Single-Agent Maven Validation
 This workflow uses a single agent inside a Docker container to run project validation tasks and report the results.
 
