@@ -32,8 +32,30 @@ Run 002 successfully verified the test suite with structured and comprehensive m
 ### Run 004 Notes
 
 - **Goal executed:** `./mvnw org.apache.maven.plugins:maven-checkstyle-plugin:3.3.1:checkstyle -Dcheckstyle.config.location=sun_checks.xml` (report goal with full plugin coordinates, because `pom.xml` has no Checkstyle plugin).
-- **Exit status:** not recorded during the run. The report goal does not fail the build on violations.
+- **Exit status:** not recorded during Run 004. Captured in the v2 re-run (Run 021): **0** (`BUILD SUCCESS`).
 - **Observation:** the prompt offered two goals ("`checkstyle:check` or `checkstyle:checkstyle`"), so the agent chose the goal and the Sun ruleset itself, and two operators could run different checks. **Next operator:** name the exact goal and ruleset in the prompt, and require the exit status in the report.
+- **Scoring baseline:** Runs 001–004 were scored against the pre-run rubric v1 (`rubric-v1-baseline.md`, commit `f7e693a`). No Checkstyle-specific rubric was committed before Run 004, so it was scored against the v1 levels, which apply to any Maven validation goal.
+- **Next run:** commit the PRD, rubric v2 and iteration-log template before execution, and score against that frozen version.
+
+## Follow-up Runs (Run 020: Maven repetition; Run 021: Checkstyle re-run under v2)
+
+| Run ID | Date | Task | Agent/Tool | Prompt/Command | Cycle Time | Rubric Scores | Pass/Fail | Review Latency | Cost | Observations |
+|---|---|---|---|---|---:|---|---|---:|---:|---|
+| Run 020 | 2026-11-05 | Repeat Maven test validation (Agent A) to preserve its output on `feature/agent-a` | Claude Code, container on `target-agent-a` | `claude` (interactive): "Run the Maven test suite. Do not modify any source or test files. Write the Maven exit status and the total, passed, failed, errored and skipped test counts to docs/test-report.md. Then run git status and confirm that docs/test-report.md is the only changed file." | not recorded | **Rubric v1.** Task Completion: 4 (exit status, all five counts and a per-class breakdown; explained why `git status` failed in the container and used a checksum comparison instead); Result Accuracy: 3 (49/49 passed, 0 failed/errored/skipped matches the Maven output; no unexpected findings); Scope Compliance: 4 (checksum comparison showed `docs/test-report.md` was the only new file; host `git status` confirmed it) | Pass | not recorded | unavailable (not captured) | `mvn -B test` exit 0, 49 tests passed. Output committed as `f9871a5` and merged by `bdffe40`. |
+| Run 021 | 2026-11-06 | Checkstyle re-run under rubric v2 with the exact goal and ruleset | Claude Code, container on `target-agent-b` | `time claude -p "Run exactly: mvn org.apache.maven.plugins:maven-checkstyle-plugin:3.3.1:checkstyle -Dcheckstyle.config.location=sun_checks.xml. Record the exit status, total violations, violation categories, errors and warnings in docs/lint-report-v2.md. Do not fix anything or modify other files." --allowedTools "Bash,Write"` | 46.8s | **Rubric v2.** Task Completion: 4 (exact goal, exit status, total, 17 categories, errors/warnings and saved report, plus per-file counts and the `checkstyle:checkstyle` vs `checkstyle:check` difference); Result Accuracy: 4 (982 total and per-category counts match the output and `lint-report-v2.md`; explained that the two Maven XRef warnings are not Checkstyle violations); Scope Compliance: 3 (no fixes; the agent could not run `git status` in the container; host `git status` showed only `docs/lint-report-v2.md`) | Pass | not recorded | unavailable (not captured) | Exit status 0 (`BUILD SUCCESS`); 982 violations, all severity `error`, 0 warnings, across 18 files. Matches Run 004's totals. Output committed as `df3fa82` and merged by `bddc059`. |
+
+**Run → rubric version → evidence commit:**
+
+| Run | Rubric | Output committed on branch | Merged by | Logged in |
+|---|---|---|---|---|
+| 001 | v1 (`f7e693a`) | none (validation only) | — | `7d34c8c` |
+| 002 | v1 | none (validation only) | — | `57d4fba` |
+| 003 | v1 | none (validation only) | — | `ab94a37` |
+| 004 | v1 | `4a8a805` on `feature/agent-b` (`lint-report.md`) | `1f51fe6` | `ab94a37` |
+| 020 | v1 (output committed before v2) | `f9871a5` on `feature/agent-a` (`test-report.md`) | `bdffe40` | this update |
+| 021 | v2 (`0ead6f6`, committed before the run) | `df3fa82` on `feature/agent-b` (`lint-report-v2.md`) | `bddc059` | this update |
+
+`bddc059`'s message says "feature/agent-b-v2", but the commit it merged (`df3fa82`) is on `feature/agent-b`; the planned new branch was not created.
 
 ## Workflow 2 — Commit-to-Merge Narrative
 

@@ -2,7 +2,7 @@
 
 **Applies to:** Task 1, Maven test validation (Workflow 1 and Workflow 2 Agent A), and Task 2, Checkstyle validation (Workflow 2 Agent B). Where the tasks differ, each level lists task-specific requirements.
 
-**Version:** v2. The task-specific anchors were added after Runs 001–004, which were scored against v1 (level 3 required the exit status and passed/failed counts only). Under v2, Run 001 would score 2 on Task Completion and Result Accuracy (no errored or skipped counts), and Run 004 would score 2 on Task Completion (no exit status recorded).
+**Version:** v2, for the next run. These are refinements made after reviewing Runs 001–004. The pre-run baseline used to score those runs is preserved in `rubric-v1-baseline.md`.
 
 ## 1. Task Completion
 
