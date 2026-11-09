@@ -1,6 +1,6 @@
 # Test Report
 
-- Date: 2026-11-05
+- Date: 2026-11-09
 - Command: `mvn -B test`
 - Maven exit status: **0** (BUILD SUCCESS)
 
@@ -14,7 +14,7 @@
 
 ## By test class
 
-| Class                                | Run | Failures | Errors | Skipped |
-|--------------------------------------|-----|----------|--------|---------|
+| Class                                   | Run | Failures | Errors | Skipped |
+|-----------------------------------------|-----|----------|--------|---------|
 | com.example.demo.AdminControllerTest    | 22  | 0        | 0      | 0       |
 | com.example.demo.CustomerControllerTest | 27  | 0        | 0      | 0       |
