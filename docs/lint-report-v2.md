@@ -1,6 +1,6 @@
 # Lint Report v2 — Checkstyle (Sun Checks)
 
-**Date:** 2026-11-07
+**Date:** 2026-11-09
 **Project:** BankingProject_Backend
 
 ## Command
@@ -38,7 +38,22 @@ Output artifacts: `target/checkstyle-result.xml`, `target/site/checkstyle.html`.
 
 No `[ERROR]` lines appeared in the Maven output.
 
-## Violations by category (Checkstyle rule)
+## Violations by category (Checkstyle check group)
+
+| Category | Rules included | Count |
+|---|---|---|
+| javadoc | MissingJavadocMethod, JavadocVariable, JavadocPackage | 289 |
+| design | DesignForExtension | 190 |
+| misc (top-level checks) | FinalParameters, NewlineAtEndOfFile | 195 |
+| coding | HiddenField, MagicNumber | 130 |
+| sizes | LineLength, ParameterNumber | 73 |
+| imports | UnusedImports, AvoidStarImport | 45 |
+| regexp | RegexpSingleline (trailing whitespace) | 41 |
+| whitespace | FileTabCharacter, WhitespaceAround, GenericWhitespace | 18 |
+| naming | MemberName | 1 |
+| **Total** | | **982** |
+
+## Violations by rule
 
 | Rule | Count |
 |---|---|
@@ -87,4 +102,5 @@ No `[ERROR]` lines appeared in the Maven output.
 ## Notes
 
 - Nothing was fixed. This is a record of the run only.
+- Results are identical to the previous run on 2026-11-07 (982 violations, same rule and file breakdown).
 - Javadoc and extensibility rules (MissingJavadocMethod, DesignForExtension, JavadocVariable) and FinalParameters make up 663 of the 982 violations (about 68%).
