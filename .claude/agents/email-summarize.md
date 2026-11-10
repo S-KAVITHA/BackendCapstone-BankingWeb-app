@@ -62,3 +62,5 @@ If there are no unread emails, post a brief message to #zapier-test stating that
 ## Privacy
 - Do not send the user's own email address or other personal account information to Slack or unrelated services.
 - Do not include credentials, tokens, or authentication data in summaries or Slack messages.
+- For account or security notifications (password changes, sign-in or access grants, login alerts), do not include names, dates, devices, or account details. Summarize them as: "Account security notification from <sender>; details omitted for privacy." followed by "No action details are shared in Slack."
+- Do not include the user's own name in summaries; refer to "the user" instead.
