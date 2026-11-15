@@ -21,11 +21,10 @@ Rules and requirements change during long sessions. This procedure ensures the a
 
 Compaction is a last resort. Proactive summarization (see .claude/skills/summarize-session/SKILL.md) should be triggered before the context window exceeds 60% capacity to avoid relying on compaction.
 
-Observations from testing (update this based on your own runs):
-- Compaction reliably preserves: [fill in based on your probe results]
-- Compaction may lose or distort: [fill in based on your probe results]
-- Manual compaction should be triggered at: [fill in your threshold]
-  Fill in the bracketed sections based on your actual probe results. 
+Observations from testing (Run 011, manual compaction probe, 2026-08-23):
+- Compaction reliably preserves: general task intent, the major style-guide rules, and high-level workflow context. Probes for the current Introduction section state and for the remaining work were fully correct after compaction.
+- Compaction may lose or distort: detailed conversational history, exact rule wording, and specific edited file states. The probe asking for the original task and full style guide was incorrect, and the probe for rule changes since the start was only partially correct.
+- Manual compaction should be triggered at: around 60% context capacity, and only after a proactive summary has been written. After compaction, verify the current files before continuing instead of relying on recall.
 
 # Agent Instructions
 

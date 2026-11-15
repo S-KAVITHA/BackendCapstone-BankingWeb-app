@@ -78,6 +78,8 @@ This boundary is necessary because Phase Two introduces a new requirement: the w
 
 The boundary therefore preserves the verified Phase One state while explicitly establishing the new Phase Two requirement. This makes requirement drift observable and allows the agent's handling of the transition to be evaluated.
 
+If omitted or moved after editing begins, the agent could keep applying the superseded "do not modify files" rule or mix old and new requirements, and the transition record would no longer show when the change took effect.
+
 ### Requirement That Changes
 
 The Phase Two requirement is that the workflow must explicitly preserve and record the requirement transition between phases.
