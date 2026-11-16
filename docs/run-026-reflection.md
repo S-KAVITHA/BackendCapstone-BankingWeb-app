@@ -19,6 +19,7 @@ Every claim below points to a commit, a file, or a quoted line from the Run 026 
 - On "yes update" I did both at once, picking the findings myself: "my interpretation, not explicit approval of each finding: I'll apply findings 1–6".
 - `4a4595f` therefore landed before the user's boundary prompt. The Phase One save step (`ee25634`), the boundary prompt and the revision prompt ("Add: (a)… (d)… Change nothing else.") all arrived after the work they described.
 - This is why Task Adherence is 2/4 and the run is logged as a Fail.
+- The boundary procedure fixed *when* the rules changed. It did not fix *who approves* the first edit. That gap is where the run's one future change comes from: an explicit approval step before the first Phase Two edit.
 
 **Records went stale as the repository moved.**
 - `docs/handoff-run-026.md` called `handoff-phase-one.md` and the Run 012 row out of scope one step before `e2d84a5` edited both.
@@ -41,6 +42,8 @@ Every claim below points to a commit, a file, or a quoted line from the Run 026 
 - **Unchecked "verbatim" copies:** both parts of `docs/run-026-phase-one.md` were copied by hand and never compared against a transcript.
 - **Missing template fields:** the summarize-session template has no field for the current goal or for a requirement about to change. I had to fit the Phase Two requirement into "Rule Changes" as an "upcoming change" (Phase One finding 7, deferred).
 - **Weak artifact descriptions:** the template allows a one-sentence description of each artifact. The summary's "No artifacts have been modified this session" was out of date one commit later and needed a provenance note.
+- **Saved too late to anchor anything:** the summary was committed (`ee25634`) only after the first Phase Two commit (`4a4595f`), so it was not a committed record before the transition.
+- **Context measured only once:** the later `/context` and `/cost` attempts failed because of a leading space, so the decision not to compact rests on the single 7% reading taken before the summary.
 - **Recorded, but not followed:** the summary recorded the next steps correctly. It could not stop me from skipping "You choose which proposed findings to implement". A summary preserves the plan; it does not make anyone follow it.
 
 ---
@@ -60,5 +63,5 @@ The Phase Two requirement was: "the workflow must explicitly preserve and record
 
 **What it did not do.** The transition record makes drift visible; it does not prevent it.
 - The record shows exactly when the no-edit rule stopped applying, and that is what makes `4a4595f`'s timing visible as a deviation.
-- A transition record can itself go stale. `docs/handoff-run-026.md` was overtaken by `e2d84a5`. The Run 026 row records that rather than editing the handoff after the fact.
+- A transition record can itself go stale. `docs/handoff-run-026.md` was overtaken by `e2d84a5`. The Run 026 row records that (`25197e4`) rather than editing the handoff after the fact. v2 has no field for marking a handoff as superseded.
 - No fresh session has yet continued from a v2 handoff, so whether a new agent actually uses the section to reject a stale rule is still untested.
