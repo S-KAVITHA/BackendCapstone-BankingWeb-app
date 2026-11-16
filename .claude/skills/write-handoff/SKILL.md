@@ -32,6 +32,8 @@ your work against the original, so accuracy here is critical.
   or **assistant-inferred**. Never present an assistant-inferred
   constraint or an unapproved proposal as a user rule.
 - Label every decision as **user-approved** or **assistant-proposed**.
+- Never treat an assistant's proposed reconstruction as an approved user
+  decision unless the user explicitly confirmed it.
 - Do not claim an artifact was created, edited, deleted, or committed
   unless the conversation or the repository shows it.
 - Never drop a superseded rule. A fresh session can only reject a stale
@@ -43,6 +45,12 @@ your work against the original, so accuracy here is critical.
 ---
 
 ## HANDOFF DOCUMENT
+
+**Provenance:** Run <run ID> · base commit <SHA> · source files: <paths>
+(Run ID as stated by the user; base commit from `git rev-parse --short
+HEAD` when the handoff is written, noting any uncommitted changes; source
+files are every file this handoff quotes or describes. Write "Cannot be
+verified" for any value you cannot confirm.)
 
 ### Overall Task
 (One paragraph describing what this workflow is trying to achieve
