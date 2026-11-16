@@ -9,6 +9,9 @@
 ## Status
 Active
 
+## Scope
+Backend code changes in `src/` for this repository; applies to any agent.
+
 ## Decision
 Tests are maintained under `src/test/java`, following the project's existing Maven package structure.
 
@@ -18,5 +21,5 @@ This follows the Maven project structure and allows the existing build configura
 ## Alternatives rejected
 Changing the existing test organization was rejected because it would introduce unnecessary project changes.
 
-## The decision I want to record is
+## How to apply
 Tests will remain under `src/test/java` using the existing package structure.

@@ -9,6 +9,9 @@
 ## Status
 Active
 
+## Scope
+Backend code changes in `src/` for this repository; applies to any agent.
+
 ## Decision
 REST API exceptions will be handled centrally using Spring's `@ControllerAdvice`.
 
@@ -18,5 +21,5 @@ Centralized exception handling provides consistent JSON error responses across t
 ## Alternatives rejected
 Handling exceptions separately inside each controller was rejected because it would duplicate error-handling logic and produce inconsistent responses.
 
-## The decision I want to record is
+## How to apply
 Common application and database exceptions, including `DataIntegrityViolationException`, must return an appropriate HTTP status and readable error message through the centralized exception handler.

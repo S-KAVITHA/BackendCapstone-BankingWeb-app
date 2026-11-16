@@ -9,6 +9,9 @@
 ## Status
 Active
 
+## Scope
+Backend code changes in `src/` for this repository; applies to any agent.
+
 ## Decision
 Backend application logging will use SLF4J through Spring Boot's logging framework instead of `System.out.println`.
 
@@ -18,5 +21,5 @@ Structured logging provides appropriate log levels and is more suitable for prod
 ## Alternatives rejected
 Continuing to use `System.out.println` was rejected because it does not provide appropriate logging levels or production-friendly logging capabilities.
 
-## The decision I want to record is
+## How to apply
 New and updated backend code must use appropriate SLF4J log levels such as `info`, `warn`, and `error` instead of `System.out.println`.
