@@ -1,6 +1,6 @@
 # Run 026 — Reflection
 
-**Question wording is provisional.** The exact text of Questions 1, 3 and 4 is not in the repository. The headings below are the question topics as summarised in the user's notes. Replace them with the exact wording before submitting; the answers do not depend on the wording.
+These answers respond to the evaluation feedback on Questions 1, 3 and 4, which asked for reflections grounded in one run: name where context held or failed (Q1), identify what the summary actually preserved and omitted (Q3), and explain how the changed requirement affected both later work and the earlier artifact (Q4). Run 026 is that run.
 
 Every claim below points to a commit, a file, or a quoted line from the Run 026 session. Commits: `4a4595f`, `ee25634`, `dfdf09f`, `32b374f`, `e2d84a5`, `0655a6a`, `1b2ab94`, `25197e4`, `13d20d3`, `b48b674`.
 
