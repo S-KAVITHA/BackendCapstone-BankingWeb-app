@@ -3,6 +3,12 @@
     "allow": [
       "mcp__gmail__*",
       "mcp__slack__*"
+    ],
+    "deny": [
+      "Edit(.memory/knowledge/**)",
+      "Write(.memory/knowledge/**)",
+      "Edit(.memory/reference/**)",
+      "Write(.memory/reference/**)"
     ]
   }
 }
