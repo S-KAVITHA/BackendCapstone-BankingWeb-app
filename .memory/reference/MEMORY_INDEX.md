@@ -25,7 +25,6 @@ These documents were added in commit `d5ee4f9` (2026-09-05) as the corpus for th
 | [decision-csv-format.md](decision-csv-format.md) | decision | internal | format, CSV vs JSON/XLSX | Why CSV was chosen as the export format. |
 | [security-export-visibility.md](security-export-visibility.md) | decision | internal | permissions, visibility, access control | Exports include only tasks the user can already read. |
 | [standards-review.md](standards-review.md) | standard | internal | code review, streaming, dependencies | Review standards for pull requests that touch the export pipeline. |
-| [cost-breakdown.md](cost-breakdown.md) | finance | **confidential** | — | **Restricted. Agents must not read, quote, or summarize it.** Listed only so that its presence is visible. A human should move it out of `.memory/` (CLAUDE.md, "Write policy"). |
 
 ## Retention
 

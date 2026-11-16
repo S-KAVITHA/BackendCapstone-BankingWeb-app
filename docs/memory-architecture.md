@@ -57,12 +57,12 @@ This document describes the memory system as submitted for the BankingProject_Ba
 * **Belongs here:** larger documents that are needed only for specific tasks. The agent finds them through an index and queries by keyword. They are never loaded automatically, and the agent never reads the whole directory.
 * **Current state:**
   * The banking backend workflow does not need any reference documents yet.
-  * The directory does hold 8 `proj-csv` documents. These were added in `d5ee4f9` as the corpus for the retrieval exercise (see `docs/retrieval-ground-truth.md`). They belong to that exercise, not to the banking workflow.
+  * The directory holds 7 `proj-csv` documents. These were added in `d5ee4f9` as the corpus for the retrieval exercise (see `docs/retrieval-ground-truth.md`). They belong to that exercise, not to the banking workflow.
   * `.memory/reference/MEMORY_INDEX.md` indexes the layer. It records that the banking workflow has no reference documents yet, and lists the `proj-csv` documents with keywords and classifications.
 * **Future condition for adding banking references:** a large document that only some tasks need, such as an API specification for the `Customer` and `Admin` endpoints or a database schema. Such a document would be too big to load at startup and would not change behavior on every task.
 * **Who may update:** humans only. Agent writes are blocked by deny rules in `.claude/settings.json`.
 * **Review triggers:** the referenced system changes, or the document is no longer used by any task.
-* **Allocation error, flagged for a human:** `cost-breakdown.md` is classified `confidential`. Under CLAUDE.md, confidential material must never be stored in any memory layer. It should be moved out of `.memory/` by a human. Agents must not read, quote, or summarize it.
+* **Allocation error, corrected:** `cost-breakdown.md` (classified `confidential`) was in this layer, against the CLAUDE.md rule that confidential material must never be stored in any memory layer. A human removed it from `.memory/` on 2026-11-16 during the Step 3 allocation review.
 
 ---
 

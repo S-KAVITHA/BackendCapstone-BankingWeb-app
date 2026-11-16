@@ -84,8 +84,6 @@ Read SCOPE.md at the root of .memory/ on startup. If it does not
 match this project, halt and report the mismatch before doing
 anything else.
 
-Then confirm the file was created and show me its contents.
-
 ### Memory Scope Policy
 
 Every project-memory entry must identify the agent, workflow, or task scope for which it is authoritative.
