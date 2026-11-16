@@ -14,6 +14,8 @@ At the start of each new phase, before doing any editing or analysis:
 4. Identify the specific artifact being worked on in this phase.
 5. Then proceed with the requested work.
 
+Every handoff must carry the requirement-transition record (rules still active, rules superseded with old → new, why, decisions still relevant, artifacts to revisit), using the Requirement Transitions section of `.claude/skills/write-handoff/SKILL.md`.
+
 ## Why This Matters
 Rules and requirements change during long sessions. This procedure ensures the agent is always operating from the current version of the rules, not a prior version buried in conversation history.
 

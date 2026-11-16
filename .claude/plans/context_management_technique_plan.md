@@ -30,6 +30,7 @@ Preserve task intent, active requirements, artifact state, and decisions in mult
 * **Where used:** When work moves across sessions or agents.
 * **Contents:** Goal, completed/remaining work, active/changed rules, decisions, file state, next action.
 * **Why:** Ensures seamless session transitions without context loss.
+* **Requirement transitions:** Every handoff must carry the requirement-transition record (rules still active, rules superseded with old → new, why, decisions still relevant, artifacts to revisit), as defined in `.claude/skills/write-handoff/SKILL.md`.
 
 ---
 

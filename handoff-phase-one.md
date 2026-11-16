@@ -1,3 +1,5 @@
+> **Provenance:** Run 012 artifact. This is the handoff document used as input for Run 012 (Handoff Boundary Evaluation, 2026-08-23) in the blog-editing workflow (Runs 008–012). Created in commit `85326ea`; last changed in commit `6087412`. It is **not** a Run 026 artifact: Run 026 used it only as evidence. Its style guide, rules, and instructions do not apply to Run 026 or later runs. (Header added in Run 026, 2026-11-16.)
+
 ## HANDOFF DOCUMENT
 
 ### Overall Task
