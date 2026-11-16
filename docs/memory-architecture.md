@@ -58,7 +58,7 @@ This document describes the memory system as submitted for the BankingProject_Ba
 * **Current state:**
   * The banking backend workflow does not need any reference documents yet.
   * The directory does hold 8 `proj-csv` documents. These were added in `d5ee4f9` as the corpus for the retrieval exercise (see `docs/retrieval-ground-truth.md`). They belong to that exercise, not to the banking workflow.
-  * There is no reference index yet. One must be added before this layer is used for the banking workflow.
+  * `.memory/reference/MEMORY_INDEX.md` indexes the layer. It records that the banking workflow has no reference documents yet, and lists the `proj-csv` documents with keywords and classifications.
 * **Future condition for adding banking references:** a large document that only some tasks need, such as an API specification for the `Customer` and `Admin` endpoints or a database schema. Such a document would be too big to load at startup and would not change behavior on every task.
 * **Who may update:** humans only. Agent writes are blocked by deny rules in `.claude/settings.json`.
 * **Review triggers:** the referenced system changes, or the document is no longer used by any task.
