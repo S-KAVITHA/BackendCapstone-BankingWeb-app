@@ -140,6 +140,7 @@ Start one container per worktree, each in its own terminal:
 cd ../target-agent-a
 docker run -it --rm --name agent-a \
   -v "${PWD}:/workspace" \
+  -v "${PWD}/.memory/knowledge:/workspace/.memory/knowledge:ro" \
   -v claude-auth:/claude-auth \
   backend-banking-capstone-app
 
@@ -147,11 +148,14 @@ docker run -it --rm --name agent-a \
 cd ../target-agent-b
 docker run -it --rm --name agent-b \
   -v "${PWD}:/workspace" \
+  -v "${PWD}/.memory/knowledge:/workspace/.memory/knowledge:ro" \
   -v claude-auth:/claude-auth \
   backend-banking-capstone-app
 ```
 
 On Windows PowerShell, replace the trailing `\` with a backtick (`` ` ``). `"${PWD}:/workspace"` works as written.
+
+The second `-v` mounts `.memory/knowledge/` read-only, so the agent (which runs as root) cannot write to the Knowledge directory: writes fail with `Read-only file system`. Keep this mount in every agent run, and edit Knowledge files from the host. See `docs/memory-architecture.md` §2 and Run 029 in `docs/iteration-log.md`.
 
 Inside each container, start Claude Code and paste that agent's guardrailed prompt:
 
@@ -174,6 +178,7 @@ By default, do all Git work on the host. If you want the agent to run read-only 
 cat ../target-agent-a/.git      # e.g. gitdir: /home/me/banking/.git/worktrees/target-agent-a
 docker run -it --rm --name agent-a \
   -v "${PWD}:/workspace" \
+  -v "${PWD}/.memory/knowledge:/workspace/.memory/knowledge:ro" \
   -v "/home/me/banking/.git:/home/me/banking/.git" \
   -v claude-auth:/claude-auth \
   backend-banking-capstone-app
@@ -277,7 +282,7 @@ git worktree prune                         # drop stale metadata, if any
 |---|---|---|
 | Create worktrees | Host | `git worktree add ../target-agent-{a,b} -b feature/agent-{a,b}` |
 | Build image | Host | `docker build -t backend-banking-capstone-app .` |
-| Run agent | Host, in worktree | `docker run -it --rm --name agent-a -v "${PWD}:/workspace" -v claude-auth:/claude-auth backend-banking-capstone-app` |
+| Run agent | Host, in worktree | `docker run -it --rm --name agent-a -v "${PWD}:/workspace" -v "${PWD}/.memory/knowledge:/workspace/.memory/knowledge:ro" -v claude-auth:/claude-auth backend-banking-capstone-app` |
 | Start Claude | Container | `claude` |
 | Review | Host, in worktree | `git diff main --stat` |
 | Commit | Host, in worktree | `git add <scope paths> && git commit` |
