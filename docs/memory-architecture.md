@@ -48,7 +48,7 @@ This document describes the memory system as submitted for the BankingProject_Ba
 * **Why here:** these rules hold until a human changes them. Keeping them apart from Project Memory stops an agent from treating a standard as a decision it can revise.
 * **Who may update:** humans only, from the host. The agent has read-only access, enforced in two layers:
   1. **Filesystem:** the agent container runs as `root`, and the repo is bind-mounted from a Windows drive (drvfs, where every file is `rwxrwxrwx`). Because of that, `chmod` cannot restrict the agent: drvfs ignores it, and root bypasses file modes anyway. Instead, the container mounts the directory **read-only**: `-v "${PWD}/.memory/knowledge:/workspace/.memory/knowledge:ro"`. Any write, even by root, then fails with `Read-only file system`.
-  2. **Tool:** deny rules in `.claude/settings.json` (`Edit(.memory/knowledge/**)` and `Write(.memory/knowledge/**)`) block the editing tools before the filesystem is reached.
+  2. **Tool:** the deny rule `Edit(.memory/knowledge/**)` in `.claude/settings.json` blocks every file-editing tool before the filesystem is reached. Claude Code applies `Edit(path)` rules to all file-editing tools. Separate `Write(path)` rules are not matched, and Run 029 showed a warning for them, so they were removed.
 * **Verification:** the in-container permission test is logged in `docs/iteration-log.md`.
 * **On denial:** the agent follows CLAUDE.md "Permission denials": stop the write, report the denial, and ask a human to make the change. It must not work around it or change these permissions.
 * **Review triggers:** a project-wide rule changes, or the code no longer matches what a file describes. Knowledge files have no review dates; humans maintain them directly.

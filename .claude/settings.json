@@ -6,9 +6,7 @@
     ],
     "deny": [
       "Edit(.memory/knowledge/**)",
-      "Write(.memory/knowledge/**)",
-      "Edit(.memory/reference/**)",
-      "Write(.memory/reference/**)"
+      "Edit(.memory/reference/**)"
     ]
   }
 }
