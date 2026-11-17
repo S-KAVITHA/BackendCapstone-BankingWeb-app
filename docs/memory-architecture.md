@@ -46,7 +46,11 @@ This document describes the memory system as submitted for the BankingProject_Ba
   * `coding-standards.md`: conventions taken from the actual code.
   * `handoff-orchestrator-to-subagent.md` and `handoff-subagent-to-orchestrator.md`: handoff formats for the bug-fix agents.
 * **Why here:** these rules hold until a human changes them. Keeping them apart from Project Memory stops an agent from treating a standard as a decision it can revise.
-* **Who may update:** humans only. The agent has read-only access. This is enforced by deny rules in `.claude/settings.json` (`Edit(.memory/knowledge/**)` and `Write(.memory/knowledge/**)`) and stated in CLAUDE.md. The agent must not change these permissions.
+* **Who may update:** humans only, from the host. The agent has read-only access, enforced in two layers:
+  1. **Filesystem:** the agent container runs as `root`, and the repo is bind-mounted from a Windows drive (drvfs, where every file is `rwxrwxrwx`). Because of that, `chmod` cannot restrict the agent: drvfs ignores it, and root bypasses file modes anyway. Instead, the container mounts the directory **read-only**: `-v "${PWD}/.memory/knowledge:/workspace/.memory/knowledge:ro"`. Any write, even by root, then fails with `Read-only file system`.
+  2. **Tool:** deny rules in `.claude/settings.json` (`Edit(.memory/knowledge/**)` and `Write(.memory/knowledge/**)`) block the editing tools before the filesystem is reached.
+* **Verification:** the in-container permission test is logged in `docs/iteration-log.md`.
+* **On denial:** the agent follows CLAUDE.md "Permission denials": stop the write, report the denial, and ask a human to make the change. It must not work around it or change these permissions.
 * **Review triggers:** a project-wide rule changes, or the code no longer matches what a file describes. Knowledge files have no review dates; humans maintain them directly.
 * **Excluded:** decisions that may change (these go in Project Memory) and step-by-step procedures (these go in skills).
 

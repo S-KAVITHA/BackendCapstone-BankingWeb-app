@@ -62,6 +62,24 @@ existing entry on the same topic. Update existing entries rather
 than creating new ones. Never write anything classified as
 Confidential or Secret to any memory layer.
 
+### Permission denials
+
+.memory/knowledge/ is protected in two ways: deny rules in
+.claude/settings.json block the Edit and Write tools, and the
+container mounts the directory read-only, so any shell write fails
+with "Read-only file system".
+
+If any write to .memory/knowledge/ or .memory/reference/ is denied
+(by a permission rule, a tool refusal, or a filesystem error):
+1. Stop the attempted write. Do not retry it.
+2. Do not work around the restriction: no other tool, shell
+  redirection, copy-and-replace, chmod, remount, or edits to
+  .claude/settings.json.
+3. Report the restriction: name the file, the change you intended,
+  and the exact denial message.
+4. Ask a human to make the update. Propose the exact text so they
+  can apply it themselves.
+
 ### Stale memory policy
 
 Before acting on any memory entry, check its review date.
