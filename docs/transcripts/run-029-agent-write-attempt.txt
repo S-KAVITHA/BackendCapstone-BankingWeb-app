@@ -1,0 +1,37 @@
+Permission deny rule (.claude/settings.json): Write(.memory/knowledge/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.memory/knowledge/**) instead (Edit rules cover all file-editing tools).
+Permission deny rule (.claude/settings.json): Write(.memory/reference/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.memory/reference/**) instead (Edit rules cover all file-editing tools).
+I didn't make this change. `.memory/knowledge/coding-standards.md` is human-maintained and read-only for me, so I need you to apply it.
+
+**Why I stopped:** The project instructions say I must never try to write to `.memory/knowledge/`. Both the Edit and Write tools are blocked for that path in `.claude/settings.json`, and the directory is mounted read-only. The file itself also says "The agent must treat this file as read-only." I didn't try the write, so there's no denial message to quote, and I didn't try any workaround.
+
+**What I meant to change:** add a rule that new services must use constructor injection. The file currently describes field injection as the norm in three places, so adding the line alone would leave it contradicting itself. Here's the text I suggest:
+
+1. **Under `## Services`**, after the "Repositories are field-injected…" bullet, add:
+   ```markdown
+   - New services must use constructor injection for their dependencies
+     (`final` fields set via the constructor) rather than `@Autowired`
+     field injection. Existing services keep field injection until they
+     are otherwise refactored.
+   ```
+
+2. **Under `## Controllers`**, the bullet "Services are field-injected with `@Autowired` (no constructor injection currently in use)" could become:
+   ```markdown
+   - Services are field-injected with `@Autowired` in existing
+     controllers; see Services for the constructor-injection rule for
+     new services.
+   ```
+
+3. **Under `## Notes worth flagging`**, the "Dependency injection is field-based…" bullet could get a pointer added:
+   ```markdown
+   - Dependency injection is field-based (`@Autowired` on fields) rather
+     than constructor-based, which is harder to unit test. New services
+     must use constructor injection (see Services).
+   ```
+
+Only item 1 is what you asked for. Items 2 and 3 just keep the file consistent, so skip them if you'd rather.
+
+Two decisions are yours:
+- **Scope:** I wrote the rule as "new services only." Tell me if existing services should be moved over too.
+- **The file's header:** it says the file describes current conventions, "not an externally imposed style guide." This new rule is a policy going forward, so you may want to reword that header.
+
+The project memory scope (BankingProject_Backend at `/workspace`) matches this project, so there's no mismatch to report.

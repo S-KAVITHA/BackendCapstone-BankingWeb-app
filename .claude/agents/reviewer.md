@@ -1,8 +1,8 @@
 ---
 name: reviewer
 description: >
-Reviews Implementer's changes for bugs, missing tests, risky edits, and
-deviations from the approved plan. Read-only. Invoked after implementation.
+  Reviews Implementer's changes for bugs, missing tests, risky edits, and
+  deviations from the approved plan. Read-only. Invoked after implementation.
 model: sonnet
 
 tools:

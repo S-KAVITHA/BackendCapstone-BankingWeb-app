@@ -1,9 +1,9 @@
 ---
 name: planner
 description: >
-Analyzes one banking web app bug report and produces a short, ordered fix plan
-and list of files to change. Invoked first, before implementation. Does not
-write code, modify files, or run tests.
+  Analyzes one banking web app bug report and produces a short, ordered fix plan
+  and list of files to change. Invoked first, before implementation. Does not
+  write code, modify files, or run tests.
 model: sonnet
 
 tools:
