@@ -1,0 +1,31 @@
+## whoami
+uid=0(root) gid=0(root) groups=0(root)
+## mount
+C:\ on /workspace/.memory/knowledge type 9p (ro,noatime,aname=drvfs;path=C:\;uid=1000;gid=1000;symlinkroot=/mnt/,cache=0x5,access=client,msize=65536,trans=fd,rfd=6,wfd=6)
+## modes
+drwxrwxrwx ubuntu:ubuntu .memory/knowledge
+-rwxrwxrwx ubuntu:ubuntu .memory/knowledge/coding-standards.md
+-rwxrwxrwx ubuntu:ubuntu .memory/knowledge/handoff-orchestrator-to-subagent.md
+-rwxrwxrwx ubuntu:ubuntu .memory/knowledge/handoff-subagent-to-orchestrator.md
+## files before
+total 8
+drwxrwxrwx 1 ubuntu ubuntu 4096 Nov 17 03:46 .
+drwxrwxrwx 1 ubuntu ubuntu 4096 Sep  5 23:38 ..
+-rwxrwxrwx 1 ubuntu ubuntu    0 Aug 27 02:01 .gitkeep
+-rwxrwxrwx 1 ubuntu ubuntu 3610 Nov 17 03:46 coding-standards.md
+-rwxrwxrwx 1 ubuntu ubuntu  976 Nov  9 04:47 handoff-orchestrator-to-subagent.md
+-rwxrwxrwx 1 ubuntu ubuntu  558 Nov  9 04:47 handoff-subagent-to-orchestrator.md
+## write attempt 1: touch
+touch: cannot touch '.memory/knowledge/probe.txt': Read-only file system
+## write attempt 2: append
+bash: .memory/knowledge/coding-standards.md: Read-only file system
+## files after
+total 8
+drwxrwxrwx 1 ubuntu ubuntu 4096 Nov 17 03:46 .
+drwxrwxrwx 1 ubuntu ubuntu 4096 Sep  5 23:38 ..
+-rwxrwxrwx 1 ubuntu ubuntu    0 Aug 27 02:01 .gitkeep
+-rwxrwxrwx 1 ubuntu ubuntu 3610 Nov 17 03:46 coding-standards.md
+-rwxrwxrwx 1 ubuntu ubuntu  976 Nov  9 04:47 handoff-orchestrator-to-subagent.md
+-rwxrwxrwx 1 ubuntu ubuntu  558 Nov  9 04:47 handoff-subagent-to-orchestrator.md
+## git status (empty = nothing changed)
+ M .memory/knowledge/coding-standards.md
