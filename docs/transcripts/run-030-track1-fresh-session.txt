@@ -1,0 +1,21 @@
+## launch: claude -p (new session; no --continue, no --resume, no pasted memory)
+Wed Nov 18 12:32:15 AM UTC 2026
+2.1.317 (Claude Code)
+I checked the memory. `SCOPE.md` names **BankingProject_Backend** at `/workspace`, which is this repo, so there's no mismatch. I sent nothing to Slack and changed no files.
+
+**1) Email-summarize Gmail summaries: `#zapier-test`**
+- **File:** `.memory/project/slack-routing.md`
+- **Declared scope:** Agent: `email-summarize`. Workflow: Gmail message summarization. Task: post email summaries to Slack.
+- **Applies?** Yes. The scope matches this question exactly. The agent's own definition (`.claude/agents/email-summarize.md`) also names `#zapier-test`.
+- **One caveat:** the policy says to check an entry's review date before acting on it. This entry has no review date, and `MEMORY_INDEX.md` doesn't list one for it either. So it isn't past due, but nothing says when it should be rechecked. You may want to add a review date.
+
+**2) Maven test results: no channel in memory**
+- **File:** `.memory/project/slack-routing.md` is the only memory entry about Slack routing.
+- **Declared scope:** limited to the `email-summarize` agent and Gmail summaries. `MEMORY_INDEX.md` also says it "applies only to the scope it declares."
+- **Applies?** No. Posting Maven test results is a different task and workflow, so this entry doesn't cover it. Using `#zapier-test` here would apply the entry outside its scope.
+- **Other files checked:** `decision-001.md` and `decision-002.md` mention Maven, but they cover where tests live and Java 8 compatibility, not Slack. Their scope is backend code changes in `src/`. Nothing in `knowledge/` or `reference/` names a Slack channel. The `post-standup` skill defaults to `#standup`, but that's for standup posts, not test results.
+
+Which channel should Maven test results go to? Once you tell me, I can propose a new memory entry with its own declared scope and review date, but only if you want one.
+## git status (empty = no files changed)
+ M lesson-4-lab-submission.patch
+?? docs/transcripts/run-030-track1-fresh-session.txt
