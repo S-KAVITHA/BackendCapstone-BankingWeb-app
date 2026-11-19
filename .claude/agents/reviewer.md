@@ -8,6 +8,9 @@ model: sonnet
 tools:
 - mcp__coursetools__file_read
 - mcp__coursetools__codebase_search
+- mcp__retrieval__retrieve
+- mcp__storage__read_entry
+- mcp__storage__list_entries
 
 disallowedTools:
 - mcp__coursetools__file_write
@@ -15,6 +18,9 @@ disallowedTools:
 - mcp__coursetools__test_runner
 - mcp__coursetools__task_tracker
 - mcp__coursetools__web_search
+- mcp__storage__write_entry
+- mcp__storage__update_entry
+- mcp__storage__delete_entry
 
 autonomy: high
 version: 1.1.0

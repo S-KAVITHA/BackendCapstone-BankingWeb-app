@@ -1,6 +1,6 @@
 # Reference Memory Index
 
-Last updated: 2026-11-16
+Last updated: 2026-11-19
 Layer: `.memory/reference/` (indexed references)
 Maintained by: humans. Agents have read-only access (deny rules in `.claude/settings.json`). Query by keyword and read only the excerpts relevant to the task. Never read the whole directory, and never write to this layer (see `CLAUDE.md`, "Memory layers").
 
@@ -8,9 +8,22 @@ Maintained by: humans. Agents have read-only access (deny rules in `.claude/sett
 
 This index lets an agent locate a reference document by keyword without reading the whole directory. Reference documents are not loaded at session start. The startup index is `.memory/project/MEMORY_INDEX.md`.
 
-## Banking backend workflow
+## Banking backend workflow: Lessons Learned (`proj-lessons`)
 
-No reference documents are currently needed for the banking backend workflow. Add one when a large document is needed only for specific tasks, such as an API specification for the `Customer` and `Admin` endpoints or a database schema. See `docs/memory-architecture.md` §3.
+Lessons from real runs on this codebase. Each one says what happened, what we learned, and how to apply it. Agents reach them only through `mcp__retrieval__retrieve` with `project_id = proj-lessons`; the server caps the ceiling at `internal`.
+
+| File | Classification | Keywords | Summary |
+|---|---|---|---|
+| [lesson-transfer-validate-target-first.md](lesson-transfer-validate-target-first.md) | internal | transfer, debit, credit, validation | Check both accounts exist before debiting (Run 028 bug). |
+| [lesson-slf4j-not-println.md](lesson-slf4j-not-println.md) | internal | logging, SLF4J, println | New code logs with SLF4J despite the existing println calls (decision-005). |
+| [lesson-knowledge-readonly-mount.md](lesson-knowledge-readonly-mount.md) | internal | read-only, chmod, drvfs, mount | Protect Knowledge with a `:ro` mount, not chmod (Run 029). |
+| [lesson-pin-mcp-sdk-v1.md](lesson-pin-mcp-sdk-v1.md) | internal | MCP, pip, mcp<2, FastMCP | Pin `mcp<2`; test imports outside the repo (Run 031). |
+| [lesson-agent-frontmatter-and-tool-ids.md](lesson-agent-frontmatter-and-tool-ids.md) | internal | YAML, frontmatter, tool IDs | Agent files must parse and use the server's exact underscore tool names. |
+| [lesson-stale-memory-review-dates.md](lesson-stale-memory-review-dates.md) | internal | review date, stale memory | Every memory entry needs a review date; undated entries need confirmation. |
+| [lesson-claude-print-mode-grants.md](lesson-claude-print-mode-grants.md) | public | claude -p, allowedTools | Grant MCP tools up front in print mode and pipe the prompt. |
+| [lesson-datasource-credentials.md](lesson-datasource-credentials.md) | **confidential** | — | **Excluded from agent retrieval by the internal ceiling.** Contains no credential values. |
+
+Ground-truth queries: `docs/lessons-ground-truth.md`.
 
 ## Retrieval-exercise corpus (`proj-csv`)
 

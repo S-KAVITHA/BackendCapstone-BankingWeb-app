@@ -32,6 +32,27 @@ The Project Manager is invoked only after testing and required human approval.
 | `tester` | `file_read`, `test_runner` | `file_write`, `codebase_search`, `shell`, `task_tracker` |
 | `project-manager` | `task_tracker` | `file_read`, `file_write`, `codebase_search`, `shell`, `test_runner` |
 
+## Storage and Retrieval Grants (Lessons Learned workflow)
+
+Servers: `storage` (`mcp/storage/server.py`, :8001) and `retrieval` (`mcp/retrieval/server.py`, :8002).
+Project for all calls: `proj-lessons`. Tool IDs: `mcp__storage__<op>` and `mcp__retrieval__retrieve`.
+
+| Role | Granted operations | Classification ceiling | Denied operations | Why |
+|---|---|---|---|---|
+| `planner` | `retrieve` | `internal` | all storage ops | Must look up prior lessons **before** proposing an approach; it plans and records nothing. |
+| `implementer` | `write_entry` | `internal` (writes accepted only at `public`/`internal`) | `read_entry`, `list_entries`, `update_entry`, `delete_entry`, `retrieve` | Records what it implemented as a new entry for later review. It works from the planner's plan, so it does not need retrieval, and it cannot change or delete history. |
+| `reviewer` | `retrieve`, `read_entry`, `list_entries` | `internal` | `write_entry`, `update_entry`, `delete_entry` | Checks the change against retrieved lessons and reads the implementer's entry. Read-only, so a review cannot alter what it reviews. |
+| `tester` | none | — | all storage ops, `retrieve` | Runs tests; prior lessons and stored entries are not needed to report results. |
+| `project-manager` | none | — | all storage ops, `retrieve` | Updates tickets only (`task_tracker`). |
+| `orchestrator` | none | — | all storage ops, `retrieve` | Delegates; reads only handoff documents via `file_read`. |
+
+### How these limits are enforced
+
+- **Grants:** each role's `tools` and `disallowedTools` in `.claude/agents/<role>.md` list exactly the operations above. Claude Code exposes only the granted tools to that subagent.
+- **Ceiling:** the retrieval server rejects any `classification_ceiling` above `RETRIEVAL_MAX_CEILING` (default `internal`), so no role can request `confidential` or `secret` results. The storage server rejects writes classified above `internal`.
+- **No direct reads:** the `coursetools` `file_read` tool refuses `.memory/reference/`, `.memory/storage.db` and `.memory/storage-audit.log`, so agents reach the corpus and stored entries only through these MCP servers, where the ceiling and audit log apply.
+- **Audit:** every `write_entry` appends a line to `/memory/storage-audit.log` with `calling_role`; no tool can edit that log.
+
 ## Human Approval
 
 Human approval is required after the Tester reports passing tests and before

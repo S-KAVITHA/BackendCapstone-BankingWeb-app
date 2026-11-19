@@ -52,10 +52,27 @@ def authorize(tool_name: str, role: str) -> None:
         )
 
 
+# The reference corpus and the storage database/audit log are reachable only through
+# the retrieval and storage MCP servers, so classification ceilings and auditing apply.
+# Project memory (.memory/project, SCOPE.md) stays readable for the CLAUDE.md startup checks.
+PROTECTED_PATHS = [
+    (ROOT / ".memory" / "reference").resolve(),
+    (ROOT / ".memory" / "storage.db").resolve(),
+    (ROOT / ".memory" / "storage-audit.log").resolve(),
+]
+
+
 def safe_path(path: str) -> Path:
     candidate = (ROOT / path).resolve()
     if not str(candidate).startswith(str(ROOT)):
         raise ValueError(f"Path escapes the project root: {path}")
+    for protected in PROTECTED_PATHS:
+        if candidate == protected or protected in candidate.parents:
+            raise PermissionError(
+                f"Access denied: {path} is served only through MCP. Use "
+                "mcp__retrieval__retrieve for the reference corpus, or the storage "
+                "tools for stored entries, instead of reading files directly."
+            )
     return candidate
 
 

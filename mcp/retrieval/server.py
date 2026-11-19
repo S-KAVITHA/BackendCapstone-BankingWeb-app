@@ -18,6 +18,9 @@ EMBEDDING_MODEL = os.getenv("RETRIEVAL_EMBEDDING_MODEL", "all-MiniLM-L6-v2")
 EMBEDDING_DIM = 384
 SIMILARITY_THRESHOLD = float(os.getenv("RETRIEVAL_SIMILARITY_THRESHOLD", "0.65"))
 DEFAULT_CEILING = "internal"
+# Server-enforced maximum. A caller cannot raise its own ceiling above this value:
+# requests for a higher ceiling are rejected. Agent-facing deployments run at "internal".
+MAX_CEILING = os.getenv("RETRIEVAL_MAX_CEILING", "internal")
 PROJECT_ID_PATTERN = re.compile(r"^[A-Za-z0-9-]+$")
 
 # Ordered from least to most sensitive. A value's index is its sensitivity rank.
@@ -276,6 +279,11 @@ def retrieve(
         raise ValueError("query must be a non-empty string")
     validate_project_id(project_id)
     validate_ceiling(classification_ceiling)
+    if rank(classification_ceiling) > rank(MAX_CEILING):
+        raise PermissionError(
+            f"classification_ceiling '{classification_ceiling}' exceeds the server maximum "
+            f"'{MAX_CEILING}' (RETRIEVAL_MAX_CEILING). Request denied."
+        )
     if top_k < 1 or top_k > 20:
         raise ValueError("top_k must be between 1 and 20")
 

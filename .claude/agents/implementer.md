@@ -9,6 +9,7 @@ tools:
  - mcp__coursetools__file_read
  - mcp__coursetools__file_write
  - mcp__coursetools__codebase_search
+ - mcp__storage__write_entry
 
 
 disallowedTools:
@@ -17,6 +18,9 @@ disallowedTools:
  - mcp__coursetools__task_tracker
  - mcp__storage__delete_entry
  - mcp__retrieval__retrieve
+ - mcp__storage__read_entry
+ - mcp__storage__list_entries
+ - mcp__storage__update_entry
 
 autonomy: medium
 version: 1.1.0
