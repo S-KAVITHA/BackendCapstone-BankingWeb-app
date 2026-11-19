@@ -1,0 +1,75 @@
+## registration
+Checking MCP server health…
+
+claude.ai Claude Docs: https://api.anthropic.com/v1/pages/mcp - ✔ Connected
+claude.ai Zapier: https://mcp.zapier.com/api/v1/connect - ✔ Connected
+gmail: node /usr/local/lib/node_modules/@gongrzhe/server-gmail-autoauth-mcp/dist/index.js - ✘ Failed to connect — CONNECTION_CLOSED: Connection closed
+coursetools: python3 /workspace/mcp/coursetools_server.py - ✘ Failed to connect — CONNECTION_CLOSED: Connection closed
+coursetools:
+  Scope: Local config (private to you in this project)
+  Status: ✘ Failed to connect
+  Issue: CONNECTION_CLOSED: Connection closed
+  Type: stdio
+  Command: python3
+  Args: /workspace/mcp/coursetools_server.py
+  Environment:
+
+To remove this server, run: claude mcp remove coursetools -s local
+## planner
+**Context boundary**
+
+1. **Goal:** Read `pom.xml` with `mcp__coursetools__file_read` (role `planner`) and report its `artifactId`.
+2. **Rules in effect:**
+   - "Do not modify files."
+   - "You do not write or edit code. You do not run commands or tests."
+   - Use `mcp__coursetools__file_read` with role `planner`.
+3. **Rules no longer in effect:** None.
+4. **Artifact:** `pom.xml`.
+
+
+<invoke name="mcp__coursetools__file_read">
+<parameter name="role">planner</parameter>
+<parameter name="path">pom.xml</parameter>
+</invoke>
+## reviewer
+**Context boundary (per CLAUDE.md)**
+
+1. **Task goal:** Use `mcp__coursetools__file_read` with role `reviewer` to read `pom.xml` and report the `java.version`, without modifying files.
+2. **Rules in effect (verbatim):**
+   - "You do not modify files or run commands."
+   - "Do not modify files." (from the user's request)
+3. **Prior rules no longer in effect:** None. This is the first phase in this session.
+4. **Artifact:** `pom.xml` in `/workspace`, read-only.
+
+**Result**
+
+I can't report the `java.version`. The `mcp__coursetools__file_read` tool isn't available in this session, so I couldn't read `pom.xml`. I won't guess the value, since a Java version is easy to get wrong.
+
+I also couldn't read `.memory/project/MEMORY_INDEX.md` or `.memory/SCOPE.md`, which CLAUDE.md asks me to check at session start. I haven't verified scope or any memory entry's review date, and none of this answer relies on memory.
+
+To proceed, you can do either of these:
+- Enable the `mcp__coursetools__file_read` tool for this session, and I'll rerun the read with role `reviewer`.
+- Paste the `<properties>` section of `pom.xml` (or the whole file), and I'll report the `java.version`. I'll also check whether `maven.compiler.source`, `maven.compiler.target`, or `maven.compiler.release` disagree with it.
+
+I haven't modified any files.
+## tester denied write
+## Context boundary
+
+1. **Task goal:** Try `mcp__coursetools__file_write` with role `tester` to create `probe.txt`, and report exactly what happened.
+2. **Rules in effect (verbatim from the Tester instructions):**
+   - "Your one job is to verify the Implementer's banking bug fix with appropriate tests and report the results."
+   - "You do not modify source code."
+   - "Do not modify source code."
+3. **Rules no longer in effect:** None. This is the first request in the session, so nothing has been superseded.
+4. **Artifact:** `probe.txt`, a new file in `/workspace`.
+
+## What happened
+
+I did not call `mcp__coursetools__file_write`, and `probe.txt` was not created. No tool definitions are available to me in this session, so I can't call that tool or any other. The tool was neither denied nor did it fail. I never attempted it, so I have no denial message or error output to quote.
+
+For the same reason, I also did not do the startup steps in `CLAUDE.md`: reading `.memory/project/MEMORY_INDEX.md` and `.memory/SCOPE.md`. Scope and stale-entry checks on memory are therefore still pending.
+
+## Notes
+
+- `probe.txt` would be a new file, not source code, so it likely wouldn't conflict with the "do not modify source code" rule. The role label `tester` doesn't change that.
+- To run the probe, the session needs the `coursetools` MCP server connected and its tools exposed to me. Once it is, I can make the call and report the exact response.
