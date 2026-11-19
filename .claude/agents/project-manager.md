@@ -2,20 +2,20 @@
 name: project-manager
 description: >
  Updates the banking bug report's issue status after review and testing.
- Owns the task-tracker tool exclusively. Invoked last after the Tester and
+ Owns the task_tracker tool exclusively. Invoked last after the Tester and
  human approval.
 model: sonnet
 
 tools:
- - mcp__coursetools__task-tracker
+ - mcp__coursetools__task_tracker
 
 disallowedTools:
- - mcp__coursetools__file-read
- - mcp__coursetools__file-write
- - mcp__coursetools__codebase-search
+ - mcp__coursetools__file_read
+ - mcp__coursetools__file_write
+ - mcp__coursetools__codebase_search
  - mcp__coursetools__shell
- - mcp__coursetools__test-runner
- - mcp__coursetools__web-search
+ - mcp__coursetools__test_runner
+ - mcp__coursetools__web_search
 
 autonomy: medium
 version: 1.1.0

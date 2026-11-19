@@ -30,7 +30,7 @@ Your job is to coordinate the workflow, delegate each phase to the correct
 subagent, evaluate results, and assemble the final summary.
 
 If you are about to perform a subagent's work yourself, stop and invoke that
-subagent instead. Use file-write only for handoff documents and the final
+subagent instead. Use file_write only for handoff documents and the final
 summary, never for application source code.
 
 ### Workflow goal and acceptance criteria

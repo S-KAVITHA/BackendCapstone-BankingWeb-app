@@ -15,8 +15,8 @@ disallowedTools:
  - mcp__coursetools__shell
  - mcp__coursetools__test_runner
  - mcp__coursetools__task_tracker
- - mcp__coursetools__delete_entry
- - mcp__coursetools__retrieve
+ - mcp__storage__delete_entry
+ - mcp__retrieval__retrieve
 
 autonomy: medium
 version: 1.1.0
