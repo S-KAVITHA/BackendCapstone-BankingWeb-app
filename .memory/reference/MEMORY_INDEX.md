@@ -21,7 +21,6 @@ Lessons from real runs on this codebase. Each one says what happened, what we le
 | [lesson-agent-frontmatter-and-tool-ids.md](lesson-agent-frontmatter-and-tool-ids.md) | internal | YAML, frontmatter, tool IDs | Agent files must parse and use the server's exact underscore tool names. |
 | [lesson-stale-memory-review-dates.md](lesson-stale-memory-review-dates.md) | internal | review date, stale memory | Every memory entry needs a review date; undated entries need confirmation. |
 | [lesson-claude-print-mode-grants.md](lesson-claude-print-mode-grants.md) | public | claude -p, allowedTools | Grant MCP tools up front in print mode and pipe the prompt. |
-| [lesson-datasource-credentials.md](lesson-datasource-credentials.md) | **confidential** | — | **Excluded from agent retrieval by the internal ceiling.** Contains no credential values. |
 
 Ground-truth queries: `docs/lessons-ground-truth.md`.
 
