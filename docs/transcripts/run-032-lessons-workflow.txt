@@ -1,0 +1,26 @@
+## state: storage+retrieval+coursetools connected; RETRIEVAL_MAX_CEILING=internal; claude -p (fresh sessions)
+retrieval: http://127.0.0.1:8002/mcp (HTTP) - ✔ Connected
+storage: http://127.0.0.1:8001/mcp (HTTP) - ✔ Connected
+coursetools: python3 /workspace/mcp/coursetools_server.py - ✔ Connected
+## 1 planner: retrieve before planning
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/workspace"].hasTrustDialogAccepted: true in /root/.claude.json.
+Not logged in · Please run /login
+## audit entry
+{"calling_role": "implementer", "classification": "internal", "entry_id": "a761b571-6999-4ccd-8ce0-c5caf00403b4", "operation": "write_entry", "project_id": "proj-csv", "timestamp": "2026-09-05T23:38:54.669672+00:00"}
+ENTRY_ID=a761b571-6999-4ccd-8ce0-c5caf00403b4
+## 3 reviewer: read entry, retrieve lessons, test ceiling and direct reads
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/workspace"].hasTrustDialogAccepted: true in /root/.claude.json.
+Not logged in · Please run /login
+## 4 restart storage process
+storage: http://127.0.0.1:8001/mcp (HTTP) - ✔ Connected
+## 5 fresh session reads the same entry
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/workspace"].hasTrustDialogAccepted: true in /root/.claude.json.
+Not logged in · Please run /login
+## audit log lines for this entry
+{"calling_role": "implementer", "classification": "internal", "entry_id": "a761b571-6999-4ccd-8ce0-c5caf00403b4", "operation": "write_entry", "project_id": "proj-csv", "timestamp": "2026-09-05T23:38:54.669672+00:00"}
+## git status
+ M lesson-4-lab-submission.patch
+ M mcp/retrieval/run_lessons_ground_truth.py
+?? docs/transcripts/run-032-ground-truth.txt
+?? docs/transcripts/run-032-lessons-workflow.txt
+?? mcp/retrieval/__pycache__/

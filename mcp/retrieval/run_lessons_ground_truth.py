@@ -38,15 +38,25 @@ CASES: list[dict[str, Any]] = [
 ]
 
 
+def as_dict(item: Any) -> dict[str, Any]:
+    """Normalize one hit: plain dict, pydantic model, or fastmcp-generated object."""
+    if isinstance(item, dict):
+        return item
+    if hasattr(item, "model_dump"):
+        return item.model_dump()
+    return dict(vars(item))
+
+
 def extract_hits(result: Any) -> list[dict[str, Any]]:
-    for attr in ("data", "structured_content", "structuredContent"):
+    # Prefer the raw JSON (structured content); fastmcp's .data may wrap items in typed objects.
+    for attr in ("structured_content", "structuredContent", "data"):
         value = getattr(result, attr, None)
         if value is not None:
             if isinstance(value, dict) and "result" in value:
-                return value["result"]
-            return value
+                value = value["result"]
+            return [as_dict(item) for item in value]
     if isinstance(result, list):
-        return result
+        return [as_dict(item) for item in result]
     raise RuntimeError(f"Could not extract structured hits from result: {result!r}")
 
 
