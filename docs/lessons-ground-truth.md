@@ -1,6 +1,6 @@
 # Lessons Learned — Retrieval Ground Truth
 
-Corpus: `.memory/reference/lesson-*.md` (served at `/memory/reference` by the retrieval MCP server)
+Corpus: `.memory/reference/lesson-*.md` (7 internal/public lessons), plus the confidential test fixture `test-fixtures/retrieval/lesson-datasource-credentials.md` for Q7–Q8. Confidential material is not kept in `.memory/` (CLAUDE.md write policy), so exclusion tests run against a test corpus that combines both folders.
 Project: `proj-lessons` for every query
 Ceiling: `internal` for every query (the server maximum, `RETRIEVAL_MAX_CEILING=internal`)
 Pass threshold: expected document in the top 3, with `similarity_score >= 0.65` (or returned by the keyword fallback)

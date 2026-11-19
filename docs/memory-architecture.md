@@ -66,6 +66,7 @@ This document describes the memory system as submitted for the BankingProject_Ba
 * **Future condition for adding banking references:** a large document that only some tasks need, such as an API specification for the `Customer` and `Admin` endpoints or a database schema. Such a document would be too big to load at startup and would not change behavior on every task.
 * **Who may update:** humans only. Agent writes are blocked by deny rules in `.claude/settings.json`.
 * **Review triggers:** the referenced system changes, or the document is no longer used by any task.
+* **Confidential test fixtures live outside memory:** documents classified `confidential` are never stored in `.memory/`. Fixtures used to test classification exclusion (`cost-breakdown.md`, `lesson-datasource-credentials.md`) are kept in `test-fixtures/retrieval/` or restored from git into a temporary test corpus, and contain no real credential values.
 * **Allocation error, corrected:** `cost-breakdown.md` (classified `confidential`) was in this layer, against the CLAUDE.md rule that confidential material must never be stored in any memory layer. A human removed it from `.memory/` on 2026-11-16 during the Step 3 allocation review.
 
 ---

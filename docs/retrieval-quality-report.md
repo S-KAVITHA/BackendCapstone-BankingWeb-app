@@ -4,7 +4,7 @@
 
 Measured output, not expected values. Source: `docs/transcripts/run-032-ground-truth.txt`, produced by `python3 mcp/retrieval/run_lessons_ground_truth.py` against the live retrieval server.
 
-- Corpus: 8 `lesson-*.md` documents in `.memory/reference/` (7 `internal`/`public`, 1 `confidential`); the server indexed 44 chunks in total (all projects).
+- Corpus: 8 `lesson-*.md` documents in `.memory/reference/` (7 `internal`/`public`, 1 `confidential`); the server indexed 44 chunks in total (all projects). After this run, the confidential lesson was moved to `test-fixtures/retrieval/` to keep confidential material out of `.memory/`; re-runs use a test corpus that combines both folders.
 - Server: `mcp/retrieval/server.py` on :8002, paragraph chunking, `RETRIEVAL_MAX_CEILING=internal`.
 - Ground truth: `docs/lessons-ground-truth.md`. Threshold `0.65`, `top_k` 3.
 
@@ -23,98 +23,30 @@ Measured output, not expected values. Source: `docs/transcripts/run-032-ground-t
 
 ---
 
-## Earlier corpus (`proj-csv`): expected values, not measured
+## Measured: `proj-csv` ground truth, Run 033, 2026-11-19
 
-This report is prefilled for the included sample corpus so the repository has a complete versioned artifact. Re-run `python3 mcp-servers/retrieval/run_ground_truth.py` in the container and update scores with your actual environment's output.
+Measured output, replacing the earlier prefilled "PASS expected" values. Source: `docs/transcripts/run-033-csv-ground-truth.txt`, produced by `RETRIEVAL_URL=http://localhost:8003/mcp python3 mcp/retrieval/run_ground_truth.py`.
 
-Corpus: `.memory/reference/` (15 documents)
+- Queries: the five in `docs/retrieval-ground-truth.md`. Only document names were corrected before execution (see the reconciliation table there); queries and pass rules are unchanged.
+- Corpus: a separate test corpus in `/tmp/csv-corpus`: the seven `proj-csv` documents from `.memory/reference/` plus `cost-breakdown.md` (`confidential`), restored from git (`a1d1b15^`) so that Q5 tests a real confidential document without putting it back into `.memory/`.
+- Server: `mcp/retrieval/server.py` on :8003, paragraph chunking, model `all-MiniLM-L6-v2`, `RETRIEVAL_MAX_CEILING=internal`. Ceiling `internal`, `top_k` 3, threshold `0.65`.
 
-Server: `mcp-servers/retrieval/server.py` on port `8002`
+| Query | Pass rule | Result | Returned (source#chunk, method, score) |
+|---|---|---|---|
+| Q1 format decision | `decision-csv-format.md` in top 3, score ≥ 0.65 | **PASS** | 1. `decision-csv-format.md#chunk0`, vector, 0.759 |
+| Q2 export implementation | `feature-csv-export.md` in top 3, score ≥ 0.65 | **PASS** | 1. `feature-csv-export.md#chunk0`, vector, 0.699 · 2. `api-spreadsheet-library.md#chunk0`, vector, 0.672 |
+| Q3 export near-miss | `feature-csv-export.md` in top 3, above `feature-csv-import.md` | **PASS** | 1. `decision-csv-format.md#chunk0`, vector, 0.711 · 2. `feature-csv-export.md#chunk0`, vector, 0.654 (import not returned) |
+| Q4 exact error code `E_EXPORT_417` | `error-codes.md` in top 3, score ≥ 0.65 | **PASS** | 1. `error-codes.md#chunk2`, vector, 0.749 · 2. `error-codes.md#chunk0`, vector, 0.654 |
+| Q5 confidential cost figures | `cost-breakdown.md` absent | **PASS** | 1. `decision-csv-format.md#chunk0` · 2. `feature-csv-import.md#chunk0` · 3. `error-codes.md#chunk2` (all keyword fallback) |
 
-Threshold: `0.65`
+**5/5 passed.**
 
-`top_k`: `3`
+### What the results show
 
-Ground truth: `docs/retrieval-ground-truth.md`
+- **Thin margins.** Q3 passed with the export chunk at 0.654, only 0.004 above the threshold, and ranked second behind the format *decision* (0.711). In Q2 the library reference (0.672) scored close to the expected document (0.699). Paragraph chunks that mix several topics put related documents close together.
+- **Exact codes worked by vector.** Q4 was expected to need the keyword fallback, but paragraph chunking put the `E_EXPORT_417` paragraph in its own chunk (`#chunk2`, 0.749), so the vector match succeeded.
+- **The ceiling held, with one limitation.** In Q5, no allowed document reached 0.65, so the server fell back to keyword search and returned three unrelated internal chunks; the confidential document was never returned. The transcript proves its absence, not its rank. The server-side rejection of a `confidential` ceiling is shown separately in Run 032 (Q8).
 
-## Summary
+### Chunking comparison: not run
 
-| Run | Chunking | Pass rate | Notes |
-| :--- | :--- | :--- | :--- |
-| Baseline | paragraph | 8/8 expected | Default core-path configuration. |
-| Stretch comparison | semantic | 8/8 expected | Optional; expected to improve multi-topic chunk isolation but cost more indexing time. |
-
-## Q1 — Export file format decision
-
-- Query: "What file format did we choose for exporting the task list?"
-- Expected: `decision-csv-format.md` in top 3 with score `>= 0.65`.
-- Expected top 3 sample:
-  1. `decision-csv-format.md` — vector, score approximately `0.80+`
-  2. `export-readme.md` — vector
-  3. `feature-csv-export.md` — vector
-- Result: PASS expected.
-
-## Q2 — CSV export implementation notes vs CSV import decoy
-
-- Query: "How does the CSV export feature build its output file?"
-- Expected: `feature-csv-export.md` in top 3 with score `>= 0.65`.
-- Decoy: `feature-csv-import.md`
-- Result: PASS expected if the export feature chunk ranks above the import decoy.
-- Tuning note: If the import decoy outranks the export document, inspect chunk boundaries in `feature-csv-export.md` and use the `doc_type = feature` filter.
-
-## Q3 — Error code lookup
-
-- Query: "What does error E_EXPORT_417 mean?"
-- Expected: `error-codes.md` returned. Keyword fallback is acceptable.
-- Result: PASS expected.
-- Tuning note: If no result appears, confirm `error-codes.md` has valid front matter and that FTS5 fallback is running.
-
-## Q4 — Retry policy
-
-- Query: "What retry policy should we use if CSV export generation fails?"
-- Expected: `feature-csv-export.md` in top 3 with score `>= 0.65`.
-- Result: PASS expected.
-- Tuning note: This is the query most likely to improve under semantic chunking because the source document covers several topics.
-
-## Q5 — Ceiling enforcement
-
-- Query: "What are the internal cost figures for the export feature?"
-- Forbidden: `cost-breakdown.md` (`confidential`)
-- Expected: `cost-breakdown.md` absent under `classification_ceiling = internal`.
-- Result: PASS expected.
-- Tuning note: Any appearance of `cost-breakdown.md` under an internal ceiling is a server bug.
-
-## Q6 — Review standards
-
-- Query: "What review standards should be applied to the CSV export implementation?"
-- Expected: `standards-review.md`.
-- Result: PASS expected.
-
-## Q7 — User-visible task scoping decision
-
-- Query: "Which tasks are allowed to appear in a CSV export?"
-- Expected: `security-export-visibility.md`.
-- Result: PASS expected.
-
-## Q8 — Spreadsheet library reference
-
-- Query: "Which spreadsheet library do we use to generate exports?"
-- Expected: `api-spreadsheet-library.md`.
-- Result: PASS expected.
-
-## Chunking comparison: paragraph vs semantic
-
-Held constant: model `all-MiniLM-L6-v2`, threshold `0.65`, `top_k = 3`, same corpus, same ground-truth set.
-
-| Query | Type | Paragraph | Semantic |
-| :--- | :--- | :--- | :--- |
-| Q1 | precision | PASS expected | PASS expected |
-| Q2 | near-miss | PASS expected | PASS expected; may rank export chunk higher |
-| Q3 | keyword | PASS expected via keyword fallback | PASS expected via keyword fallback |
-| Q4 | precision/chunking | PASS expected; watch for dilution | PASS expected; should isolate retry-policy topic |
-| Q5 | ceiling | PASS expected; forbidden doc absent | PASS expected; forbidden doc absent |
-| Q6 | precision | PASS expected | PASS expected |
-| Q7 | precision | PASS expected | PASS expected |
-| Q8 | precision | PASS expected | PASS expected |
-
-Decision: keep `paragraph` as the default core-path chunking strategy unless a real run of the harness shows semantic chunking materially improves pass rate or ranking on the current corpus.
+Semantic chunking was not measured. The Q3 margin (0.654) is the evidence for trying it next: if semantic chunking separates the "how export works" paragraph from the format discussion, the export chunk should score higher and rank first. Keep the answer key unchanged and re-run Q2–Q3 with `--chunking semantic`.
