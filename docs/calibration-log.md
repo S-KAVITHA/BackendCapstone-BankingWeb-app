@@ -132,3 +132,52 @@ Run: `python3 eval/run_holdout.py .eval-artifacts/runs/holdout-clean` (from repo
 **Interpretation:** With the tester-id-guess fix confirmed live and no other code changes since the last individual fault fixes, every deterministic check passes cleanly on a fresh live run of every canonical task — a real improvement over the mixed-fixture 2026-09-16 measurement, and consistent with this cycle's regression check finding no new deterministic breakage. The rubric suite (LLM-judge-scored, via nested `claude -p` calls — 4 dimensions × 6 tasks = 24 judge calls) remains the weaker layer: only 1/6 tasks pass both layers fully. Per-dimension detail was not archived for this entry (aggregate only, to avoid a second full round of judge calls); a follow-up cycle should capture and root-cause the specific failing dimensions per task before claiming rubric-layer fixes.
 
 **Known gaps carried forward:** `audit_matches_writes` and `role_order` (HO-02), `similarity_floor` (HO-04) on the older `holdout/` fixtures (unaffected by this cycle's fix, not reproduced on the fresh clean runs); the `write_entry` schema-crash surfaced above; the missing `read_matches_write` deterministic check; rubric-layer failures on 5/6 tasks (not yet root-caused per-dimension).
+
+### 2026-11-20: Tester guesses an entry_id (automated detection added)
+
+- **Failure mode:** Tester guesses an entry_id (see 2026-09-14 and 2026-09-21). Both earlier entries left automated detection open: all 14 deterministic checks passed on the faulted run.
+- **Check that caught it:** `read_matches_write` (deterministic, new, `eval/test_deterministic.py`; commit `e020135`). Each `read_entry` by the tester must use an `entry_id` returned by an earlier `write_entry` in the same run.
+- **Detector choice:** deterministic, not rubric. The failure is a fact about IDs in the transcript (written ID vs read ID), so an exact comparison detects it every time at no cost. A judge only noticed it incidentally ("the tester read a different entry ID") and still let `task_adherence` pass.
+- **Before:** FAIL. `RUN-20260921-014752`: 14/15, "tester read 'api-validation-rule-decision', which no earlier write_entry returned (written: ['cd10904f-996d-4da9-86d3-2d6584401ae3'])". The rubric gate then skipped scoring. Diagnostic scores with the gate bypassed: correctness 2, task_adherence 3, groundedness 2, clarity 3, aggregate 10/12 FAIL.
+- **Fix layer / fix applied:** Scope (handoff content). `eval/orchestrator.py` `run_role` passes `written_entry_ids` in `scoped_handoff` (unchanged since 2026-09-21; this cycle adds the detector).
+- **After:** PASS. `RUN-20260921-014857`: 15/15, "1 verification read(s) targeted entry_ids written earlier in this run." Rubric: correctness 2, task_adherence 3, groundedness 1, clarity 3, aggregate 9/12 FAIL.
+- **What the before/after shows:** the fix corrects the ID handoff, which is what the new check measures. It does not improve output quality: both runs fail the rubric, mainly on groundedness (rate-limit documents cited as the basis for a validation-rule change). Fixing the handoff did not fix grounding.
+- **Retroactive finding:** the new check also fails the older fixtures `holdout/HO-02-*`, `HO-04-*`, `HO-05-*` and `dev/RUN-20260913-034348`, `RUN-20260914-035241`, `RUN-20260921-011132` (tester read `'implementation'` or an invented ID). Those runs predate the handoff fix; the failure was present and undetected. No false positives on the six `holdout-clean` runs or the six `holdout-v2` runs.
+- **Evidence:** `.eval-artifacts/calibration-evidence/deterministic-RUN-20260921-014752.txt`, `deterministic-RUN-20260921-014857.txt`, `rubric-RUN-20260921-014752.txt`, `rubric-RUN-20260921-014857.txt`; audit logs `.eval-artifacts/runs/dev/RUN-20260921-014752.log`, `RUN-20260921-014857.log`.
+
+### 2026-11-20: Regression run through the fixed orchestration
+
+- **Task:** HO-02 (date-parsing refactor with review), previously passing 15/15 deterministic in `holdout-clean/HO-02.json` (2026-09-21, baseline).
+- **Run:** a new live run through the current `eval/orchestrator.py` at `e020135`: `.eval-artifacts/runs/regression/HO-02-after-fix.json`. Both baseline and new run evaluated in `.eval-artifacts/runs/regression/COMPARISON.txt`.
+- **Result:**
+
+| | Deterministic | correctness | task_adherence | groundedness | clarity | Aggregate |
+|---|---|---|---|---|---|---|
+| Baseline `holdout-clean/HO-02` | 15/15 | 1 | 3 | 2 | 2 | 8 FAIL |
+| After fix `regression/HO-02-after-fix` | 15/15 | 1 | 3 | 2 | 2 | 8 FAIL |
+
+- **Conclusion:** no regression. The deterministic floor and every rubric score are unchanged. The quality failure is also unchanged and has a different cause in each run: the baseline approved work that did not exist; the new run stopped over a missing `project_id` ("every agent stopped over a missing project_id"). The fix did not cause this; it is a pre-existing gap in how roles handle missing inputs.
+
+## 2026-11-20: Holdout Measurement (holdout-v2, single fixed-version pass)
+
+Replaces the 2026-09-21 measurement as the reference result. That pass retried HO-06 after a crash and did not archive its output, so it was not a single clean measurement.
+
+- **Version:** commit `e020135` (source unchanged during the pass; only compiled `.pyc` caches differed). Judge: Claude Code 2.1.329, a new `claude -p` session per judge call in `/workspace`.
+- **Procedure:** `bash eval/run_holdout_pass.sh .eval-artifacts/runs/holdout-v2`: each canonical task from `docs/holdout-task-set.md` run once, crashes recorded as outcomes, no retries. Started 04:56:52Z, finished 05:02:35Z.
+- **Crashes:** none (6/6 orchestrator exits 0).
+- **Deterministic checks:** 90 / 90 (15 checks × 6 tasks).
+- **Rubric suite:** 59 / 96 aggregate; 12 / 24 dimension checks pass.
+- **Tasks passing both layers:** 1 / 6 (HO-01, aggregate 13).
+
+| Task | correctness | task_adherence | groundedness | clarity | Aggregate |
+|---|---|---|---|---|---|
+| HO-01 | 3 | 3 | 3 | 4 | 13 PASS |
+| HO-02 | 2 | 3 | 2 | 3 | 10 FAIL |
+| HO-03 | 2 | 2 | 2 | 3 | 9 FAIL |
+| HO-04 | 1 | 3 | 3 | 3 | 10 FAIL |
+| HO-05 | 1 | 3 | 3 | 2 | 9 FAIL |
+| HO-06 | 2 | 2 | 2 | 2 | 8 FAIL |
+
+- **Interpretation:** structural behavior is solid: every routing, grant, audit, citation and ID-handoff check passes on unseen tasks. Quality is not: correctness is the weakest dimension (mean 1.8). Two patterns recur across tasks: (1) agents approve or summarize work that was never done (HO-02, HO-06); (2) agents stall on a missing input such as `project_id` and never escalate to a human (HO-04, HO-05). Retrieval of off-topic rate-limit documents appears in almost every run.
+- **Evidence:** `.eval-artifacts/runs/holdout-v2/` (six transcripts, audit logs, orchestrator output) and `PASS-SUMMARY.md`.
+- **Known gaps carried forward:** missing-input escalation; approving unperformed work; retrieval relevance for non-incident tasks. The holdout tasks stay locked; these are recorded, not tuned against.
