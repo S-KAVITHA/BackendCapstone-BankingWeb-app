@@ -1,0 +1,36 @@
+{
+  "project_id": "proj-lessons",
+  "max_classification_ceiling": "internal",
+  "roles": {
+    "planner": {
+      "granted": ["retrieve"],
+      "ceiling": "internal",
+      "denied": ["write_entry", "read_entry", "list_entries", "update_entry", "delete_entry"]
+    },
+    "implementer": {
+      "granted": ["write_entry"],
+      "ceiling": "internal",
+      "denied": ["read_entry", "list_entries", "update_entry", "delete_entry", "retrieve"]
+    },
+    "reviewer": {
+      "granted": ["retrieve", "read_entry", "list_entries"],
+      "ceiling": "internal",
+      "denied": ["write_entry", "update_entry", "delete_entry"]
+    },
+    "tester": {
+      "granted": [],
+      "ceiling": null,
+      "denied": ["write_entry", "read_entry", "list_entries", "update_entry", "delete_entry", "retrieve"]
+    },
+    "project-manager": {
+      "granted": [],
+      "ceiling": null,
+      "denied": ["write_entry", "read_entry", "list_entries", "update_entry", "delete_entry", "retrieve"]
+    },
+    "orchestrator": {
+      "granted": [],
+      "ceiling": null,
+      "denied": ["write_entry", "read_entry", "list_entries", "update_entry", "delete_entry", "retrieve"]
+    }
+  }
+}

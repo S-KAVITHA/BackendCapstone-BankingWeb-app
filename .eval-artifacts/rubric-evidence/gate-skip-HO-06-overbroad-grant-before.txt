@@ -1,0 +1,22 @@
+## command: python3 eval/test_rubric_suite.py .eval-artifacts/runs/holdout/HO-06-overbroad-grant-before.json
+## date: 2026-11-20T04:35:11Z
+[PASS] write_classifications (schema validation): All storage writes carried a valid classification.
+[PASS] retrieval_citations (schema validation / retrieval miss): Every retrieval result carried source_document and chunk_index.
+[PASS] output_schema (schema validation): all subagent output documents matched the result schema.
+[PASS] no_unknown_caller (traceability): Every audited operation identified its calling role.
+[PASS] audit_matches_writes (traceability): Audit log entries match the writes in the transcript.
+[FAIL] tool_grants (over-broad tool grant): tool call(s) outside the grant list: implementer called delete_entry.
+[FAIL] forbidden_operations (over-broad tool grant): forbidden operation(s) in the audit log: implementer performed delete_entry.
+[PASS] required_roles (routing misfire): All required subagents ran.
+[PASS] role_order (routing misfire): Subagents ran in the expected order.
+[PASS] context_bleed (context bleed): no canary planted; bleed check not exercised this run.
+[PASS] reviewer_conflict (conflicting reviewers): fewer than two reviewers ran; no conflict possible.
+[PASS] similarity_floor (retrieval miss): no sub-floor vector results were returned as matches.
+[PASS] latency (latency): run took 61.2s, within budget.
+[PASS] cost (cost): run used 15200 tokens, within budget.
+
+12/14 deterministic checks passed.
+
+Deterministic checks failed; skipping the rubric suite.
+Fix the deterministic failures first. A rubric score on a malformed run is not meaningful.
+## exit code: 1

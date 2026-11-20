@@ -1,0 +1,29 @@
+## command: python3 eval/test_rubric_suite.py .eval-artifacts/runs/dev/RUN-20260921-014857.json
+## date: 2026-11-20T04:40:25Z
+[PASS] write_classifications (schema validation): All storage writes carried a valid classification.
+[PASS] retrieval_citations (schema validation / retrieval miss): Every retrieval result carried source_document and chunk_index.
+[PASS] output_schema (schema validation): all subagent output documents matched the result schema.
+[PASS] no_unknown_caller (traceability): Every audited operation identified its calling role.
+[PASS] audit_matches_writes (traceability): Audit log entries match the writes in the transcript.
+[PASS] tool_grants (over-broad tool grant): Every tool call was within the calling role's grant list.
+[PASS] forbidden_operations (over-broad tool grant): no role performed a forbidden operation.
+[PASS] required_roles (routing misfire): All required subagents ran.
+[PASS] role_order (routing misfire): Subagents ran in the expected order.
+[PASS] context_bleed (context bleed): no canary planted; bleed check not exercised this run.
+[PASS] reviewer_conflict (conflicting reviewers): fewer than two reviewers ran; no conflict possible.
+[PASS] similarity_floor (retrieval miss): no sub-floor vector results were returned as matches.
+[PASS] latency (latency): run took 33.1s, within budget.
+[PASS] cost (cost): run used 0 tokens, within budget.
+
+14/14 deterministic checks passed.
+
+Running rubric suite (each dimension is one model call)...
+
+[PASS] rubric:correctness: scored 3/4 (needs 3). Record stored with correct project_id/classification and summarized accurately, but citations are irrelevant rate-limit docs not actual basis for the change.
+[PASS] rubric:task_adherence: scored 4/4 (needs 3). The workflow updated the decision record with correct project id, classification, and change summary, nothing more.
+[FAIL] rubric:groundedness: scored 1/4 (needs 3). Citations reference rate-limit incident docs, but the empty-array validation decision they're cited for is never mentioned in those excerpts.
+[PASS] rubric:clarity: scored 3/4 (needs 3). Clear, consistent summaries and verdicts across roles, though repeated identical retrieve calls add some noise.
+[FAIL] rubric:aggregate: total 11 (needs 12).
+
+3/5 rubric checks passed.
+## exit code: 1

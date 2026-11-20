@@ -31,7 +31,10 @@ def call_judge(prompt):
         timeout=180,
     )
     if completed.returncode != 0:
-        raise RuntimeError(f"judge invocation failed: {completed.stderr.strip()}")
+        raise RuntimeError(
+            f"judge invocation failed (exit {completed.returncode}). "
+            f"stderr: {completed.stderr.strip()[:500]} | stdout: {completed.stdout.strip()[:500]}"
+        )
     envelope = json.loads(completed.stdout)
     return envelope["result"]
 
@@ -75,35 +78,53 @@ def build_judge_prompt(dimension, transcript_text):
         "(one short sentence, no more than 30 words). Return nothing else.\n\n"
         f"DIMENSION: {dimension['name']}\n"
         f"WHAT IT MEASURES: {dimension['description']}\n"
-        f"LEVELS:\n{json.dumps(dimension['levels'], indent=2)}\n\n"
+        f"LEVELS:\n{json.dumps(dimension['levels'], indent=2)}\n"
+        f"ANCHORING EXAMPLES (what a run at that level looks like):\n"
+        f"{json.dumps(dimension.get('examples', {}), indent=2)}\n\n"
         f"RUN TRANSCRIPT:\n{transcript_text}\n"
     )
 
 
+def validate_score(score_obj, dimension):
+    """Accept a judge result only if it is well-formed; raise ValueError otherwise."""
+    if not isinstance(score_obj, dict):
+        raise ValueError("judge result is not a JSON object")
+    score = score_obj.get("score")
+    if isinstance(score, bool) or not isinstance(score, int) or not 1 <= score <= 4:
+        raise ValueError(f"score must be an integer from 1 to 4, got {score!r}")
+    justification = score_obj.get("justification")
+    if not isinstance(justification, str) or not justification.strip():
+        raise ValueError("justification must be a non-empty string")
+    if score_obj.get("dimension") not in (None, dimension["name"]):
+        raise ValueError(
+            f"judge scored dimension {score_obj.get('dimension')!r}, expected {dimension['name']!r}"
+        )
+    return score, justification.strip()
+
+
 def check_dimension(dimension, transcript_text, retries=2):
-    """Call the judge, retrying if it returns a truncated/malformed reply.
+    """Call the judge, retrying if it returns a truncated, malformed or invalid reply.
 
     The judge is a live model call and occasionally cuts its justification
-    short before closing the JSON object; that's transient, not a parsing
-    bug, so retry a couple of times before giving up.
+    short before closing the JSON object, or returns an out-of-range score;
+    retry a couple of times before giving up. Invalid results are never accepted.
     """
     prompt = build_judge_prompt(dimension, transcript_text)
     last_err = None
-    score_obj = None
+    validated = None
     for _ in range(retries + 1):
         reply = call_judge(prompt)
         try:
-            score_obj = parse_score(reply)
+            validated = validate_score(parse_score(reply), dimension)
             break
         except ValueError as e:
             last_err = e
-    if score_obj is None:
+    if validated is None:
         raise RuntimeError(
-            f"judge failed to return parseable JSON for dimension "
+            f"judge failed to return a valid score for dimension "
             f"'{dimension['name']}' after {retries + 1} attempts: {last_err}"
         )
-    score = int(score_obj["score"])
-    justification = score_obj.get("justification", "")
+    score, justification = validated
     passed = score >= dimension["pass_threshold"]
     return {
         "check": f"rubric:{dimension['name']}",
