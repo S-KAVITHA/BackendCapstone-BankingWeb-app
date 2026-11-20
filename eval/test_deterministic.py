@@ -315,6 +315,50 @@ def check_cost(transcript):
     return result("cost", "cost", True, f"run used {cost} tokens, within budget.")
 
 
+VERIFYING_ROLES = {"tester"}
+
+
+def check_read_matches_write(transcript):
+    """Traceability: the tester's verification read targets an entry this run wrote.
+
+    Added after the "tester guesses an entry_id" failure (calibration log, 2026-09-21):
+    the tester read a fabricated ID and the simulated store returned stub content, so
+    every other check passed. Each read_entry by a verifying role must use an entry_id
+    returned by an earlier write_entry in the same run.
+    """
+    written = set()
+    mismatches = []
+    verified = 0
+    for event in transcript.get("events", []):
+        if event.get("type") != "tool_call":
+            continue
+        entry_id = (event.get("result") or {}).get("entry_id")
+        if event.get("tool") == "write_entry" and entry_id:
+            written.add(entry_id)
+        elif event.get("tool") == "read_entry" and event.get("role") in VERIFYING_ROLES:
+            if entry_id in written:
+                verified += 1
+            else:
+                mismatches.append(
+                    f"{event.get('role')} read {entry_id!r}, which no earlier write_entry returned "
+                    f"(written: {sorted(written) or 'none'})"
+                )
+    if mismatches:
+        return result(
+            "read_matches_write", "traceability", False,
+            "verification read(s) not tied to a preceding write: " + "; ".join(mismatches) + ".",
+        )
+    if verified == 0:
+        return result(
+            "read_matches_write", "traceability", True,
+            "no verification read_entry in this run; check not exercised.",
+        )
+    return result(
+        "read_matches_write", "traceability", True,
+        f"{verified} verification read(s) targeted entry_ids written earlier in this run.",
+    )
+
+
 def collect_results(transcript_path):
     """Run every deterministic check and return the structured results unprinted."""
     audit_log_path = os.path.splitext(transcript_path)[0] + ".log"
@@ -328,6 +372,7 @@ def collect_results(transcript_path):
         check_output_schema(transcript),
         check_no_unknown_caller(audit_entries),
         check_audit_matches_writes(transcript, audit_entries),
+        check_read_matches_write(transcript),
         check_tool_grants(transcript, grant_map),
         check_forbidden_operations(audit_entries),
         check_required_roles(transcript, expected_path),

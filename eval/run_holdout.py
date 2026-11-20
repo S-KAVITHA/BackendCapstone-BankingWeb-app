@@ -27,6 +27,10 @@ def run_holdout(holdout_dir):
     for path in transcripts:
         det = collect_results(path)
         task_det_passed = sum(r["passed"] for r in det)
+        print(f"\n=== {os.path.basename(path)}: deterministic {task_det_passed}/{len(det)}")
+        for r in det:
+            if not r["passed"]:
+                print(f"    [FAIL] {r['check']}: {r['message']}")
         det_passed += task_det_passed
         det_total += len(det)
         for r in det:
@@ -36,9 +40,12 @@ def run_holdout(holdout_dir):
         if task_det_passed != len(det):
             # The gate from the rubric section: a task that fails its
             # deterministic floor does not get a rubric score.
+            print("    rubric: skipped (deterministic floor not met)")
             continue
 
         rub = collect_rubric_results(path)
+        for r in rub:
+            print(f"    [{'PASS' if r['passed'] else 'FAIL'}] {r['check']}: {r['message']}")
         dims = [r for r in rub if r["check"] != "rubric:aggregate"]
         rubric_score += sum(r["score"] for r in dims)
         rubric_max += 4 * len(dims)
@@ -48,6 +55,7 @@ def run_holdout(holdout_dir):
         if aggregate["passed"]:
             fully_passing += 1
 
+    print("\n=== SUMMARY")
     print(f"Holdout set size: {n_tasks} tasks")
     print(f"Deterministic checks: {det_passed} / {det_total} passing across all tasks")
     if failing_checks:
