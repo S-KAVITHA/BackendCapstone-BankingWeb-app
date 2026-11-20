@@ -1,0 +1,6 @@
+{"timestamp": "2026-11-20T04:59:06.014932+00:00", "operation": "write_entry", "project_id": "demo-project", "entry_id": "9bf4826d-7725-455f-a895-c56eaddc6b69", "classification": "internal", "calling_role": "project_manager"}
+{"timestamp": "2026-11-20T04:59:09.735510+00:00", "operation": "read_entry", "project_id": "demo-project", "entry_id": "9bf4826d-7725-455f-a895-c56eaddc6b69", "classification": "internal", "calling_role": "planner"}
+{"timestamp": "2026-11-20T04:59:20.221777+00:00", "operation": "read_entry", "project_id": "demo-project", "entry_id": "9bf4826d-7725-455f-a895-c56eaddc6b69", "classification": "internal", "calling_role": "implementer"}
+{"timestamp": "2026-11-20T04:59:24.621848+00:00", "operation": "write_entry", "project_id": "demo-project", "entry_id": "9143b484-947c-4a06-a101-9c22487825b4", "classification": "internal", "calling_role": "implementer"}
+{"timestamp": "2026-11-20T04:59:35.466088+00:00", "operation": "read_entry", "project_id": "demo-project", "entry_id": "9bf4826d-7725-455f-a895-c56eaddc6b69", "classification": "internal", "calling_role": "tester"}
+{"timestamp": "2026-11-20T04:59:35.466583+00:00", "operation": "read_entry", "project_id": "demo-project", "entry_id": "9143b484-947c-4a06-a101-9c22487825b4", "classification": "internal", "calling_role": "tester"}

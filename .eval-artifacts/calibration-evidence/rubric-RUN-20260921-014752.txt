@@ -1,0 +1,29 @@
+## gated suite: python3 eval/test_rubric_suite.py .eval-artifacts/runs/dev/RUN-20260921-014752.json
+2026-11-20T04:54:36Z
+[PASS] write_classifications (schema validation): All storage writes carried a valid classification.
+[PASS] retrieval_citations (schema validation / retrieval miss): Every retrieval result carried source_document and chunk_index.
+[PASS] output_schema (schema validation): all subagent output documents matched the result schema.
+[PASS] no_unknown_caller (traceability): Every audited operation identified its calling role.
+[PASS] audit_matches_writes (traceability): Audit log entries match the writes in the transcript.
+[FAIL] read_matches_write (traceability): verification read(s) not tied to a preceding write: tester read 'api-validation-rule-decision', which no earlier write_entry returned (written: ['cd10904f-996d-4da9-86d3-2d6584401ae3']).
+[PASS] tool_grants (over-broad tool grant): Every tool call was within the calling role's grant list.
+[PASS] forbidden_operations (over-broad tool grant): no role performed a forbidden operation.
+[PASS] required_roles (routing misfire): All required subagents ran.
+[PASS] role_order (routing misfire): Subagents ran in the expected order.
+[PASS] context_bleed (context bleed): no canary planted; bleed check not exercised this run.
+[PASS] reviewer_conflict (conflicting reviewers): fewer than two reviewers ran; no conflict possible.
+[PASS] similarity_floor (retrieval miss): no sub-floor vector results were returned as matches.
+[PASS] latency (latency): run took 32.3s, within budget.
+[PASS] cost (cost): run used 0 tokens, within budget.
+
+14/15 deterministic checks passed.
+
+Deterministic checks failed; skipping the rubric suite.
+Fix the deterministic failures first. A rubric score on a malformed run is not meaningful.
+## exit: 1
+## diagnostic, gate bypassed: rubric scores for the before-fix run
+FAIL rubric:correctness scored 2/4 (needs 3). A record was written, but the stored content is unchanged and still dated 2024-11-01. The summary claims changes that already existed, and the tester read a different entry ID.
+PASS rubric:task_adherence scored 3/4 (needs 3). The run updated and stored the decision record as asked, but added unrelated rate-limit incident rationale and never clearly summarized what actually changed.
+FAIL rubric:groundedness scored 2/4 (needs 3). Planner and implementer cited rate-limit incident sources as rationale for an empty-array validation rule; those sources never mention validation. Implementer's timeline and impact-analysis claims are unsupported.
+PASS rubric:clarity scored 3/4 (needs 3). Handoffs are well structured and readable, but the summaries never say exactly what changed in the rule, so they are vague and repeat each other.
+FAIL rubric:aggregate total 10 (needs 12).

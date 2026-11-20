@@ -1,0 +1,15 @@
+Running orchestration: ['project_manager', 'planner']
+  [project_manager] starting (step 1)
+  [project_manager] done. handoff: {
+  "task": "Last quarter a client was knocked offline when our API rate limits ...
+  [planner] starting (step 2)
+    [planner] calling retrieve
+    [planner] calling read_entry
+    [planner] calling read_entry
+    [planner] calling retrieve
+  [planner] done. handoff: {
+  "task": "Last quarter a client was knocked offline when our API rate limits ...
+
+Transcript written to: .eval-artifacts/runs/holdout-v2/HO-01.json
+Audit log written to:  .eval-artifacts/runs/holdout-v2/HO-01.log
+Duration: 10.4s  |  Audit entries: 2
