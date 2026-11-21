@@ -13,7 +13,7 @@ LOG="$OUT/PASS-SUMMARY.md"
   echo "- Started (UTC): $(date -u +%FT%TZ)"
   echo "- Working directory: $(pwd)"
   echo "- Commit: $(git -c safe.directory="$(pwd)" rev-parse --short HEAD) ($(git -c safe.directory="$(pwd)" status --short eval/ | wc -l) uncommitted eval/ files)"
-  echo "- Claude Code (judge): $(claude --version 2>&1); each judge call is a new \`claude -p\` session in this directory"
+  echo "- Claude Code: $(claude --version 2>&1). Each task runs in its own new \`claude -p\` conversation (no --continue/--resume) whose session transcript is copied to sessions/<task>.session.jsonl; each judge call is a separate new \`claude -p\` session"
   echo "- Role model: see MODEL in eval/orchestrator.py"
   echo "- Policy: one attempt per task; a crash is recorded as the outcome and not retried"
   echo
@@ -21,15 +21,31 @@ LOG="$OUT/PASS-SUMMARY.md"
   echo "|---|---|---|"
 } > "$LOG"
 
+SESS_DIR="$OUT/sessions"; mkdir -p "$SESS_DIR"
+CLAUDE_PROJECT_DIR="${HOME}/.claude/projects/$(pwd | sed 's#[/.]#-#g')"
+
 run_task () {  # id, then orchestrator args
+  # Each task runs in its own NEW Claude Code conversation (plain `claude -p`: no
+  # --continue, no --resume). That conversation runs the orchestrator command once.
   local id="$1"; shift
-  python3 eval/orchestrator.py "$@" --out "$OUT/$id.json" > "$OUT/$id.orchestrator.txt" 2>&1
-  local code=$?
-  if [ $code -eq 0 ] && [ -f "$OUT/$id.json" ]; then
-    echo "| $id | 0 | transcript written |" >> "$LOG"
+  local cmd="python3 eval/orchestrator.py"
+  for a in "$@"; do cmd="$cmd '$a'"; done
+  cmd="$cmd --out $OUT/$id.json"
+  printf '%s\n' "$cmd" > "$SESS_DIR/$id.command.txt"
+  claude -p "Holdout measurement task $id. Use the Bash tool to run exactly this one command from /workspace, once, without modifying it, without retrying, and without running anything else: $cmd    When it finishes, reply with exactly one line: EXIT=<the command's exit code>." \
+    --allowedTools "Bash(python3 eval/orchestrator.py:*)" --output-format json > "$SESS_DIR/$id.claude.json" 2> "$SESS_DIR/$id.claude.stderr"
+  local sid; sid=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('session_id',''))" "$SESS_DIR/$id.claude.json" 2>/dev/null)
+  echo "$sid" > "$SESS_DIR/$id.session-id.txt"
+  [ -n "$sid" ] && [ -f "$CLAUDE_PROJECT_DIR/$sid.jsonl" ] && cp "$CLAUDE_PROJECT_DIR/$sid.jsonl" "$SESS_DIR/$id.session.jsonl"
+  python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('result',''))" "$SESS_DIR/$id.claude.json" > "$OUT/$id.orchestrator.txt" 2>/dev/null
+  local code; code=$(grep -o 'EXIT=[0-9]*' "$OUT/$id.orchestrator.txt" 2>/dev/null | head -1 | cut -d= -f2)
+  code=${code:-unknown}
+  if [ -f "$OUT/$id.json" ] && [ "$code" = "0" ]; then
+    echo "| $id | 0 | transcript written; Claude Code session \`$sid\` |" >> "$LOG"
+  elif [ -f "$OUT/$id.json" ]; then
+    echo "| $id | $code | transcript written, but the session reported exit '$code' (kept, flagged); session \`$sid\` |" >> "$LOG"
   else
-    echo "| $id | $code | CRASH: $(tail -1 "$OUT/$id.orchestrator.txt" | tr '|' '/') |" >> "$LOG"
-    rm -f "$OUT/$id.json"
+    echo "| $id | $code | CRASH: no transcript (session \`$sid\`): $(tail -1 "$OUT/$id.orchestrator.txt" 2>/dev/null | tr '|' '/') |" >> "$LOG"
   fi
 }
 
